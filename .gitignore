@@ -1,0 +1,11 @@
+datasets
+!unipose/datasets
+external
+*.pyc
+__pycache__
+cache
+logs
+checkpoints
+exp
+temp
+tmp
