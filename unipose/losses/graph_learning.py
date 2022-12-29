@@ -1,3 +1,8 @@
+"""Graph Learning by Smoothness (GLES) Loss
+
+@author: Yihang Qiu
+"""
+
 from math import log10 as log
 from math import sqrt
 
@@ -6,7 +11,7 @@ from torch import nn
 import torch.nn.functional as F
 
 
-def SparsePlus(x, epsilon=1e-8):
+def SquarePlus(x, epsilon=1e-8):
     return (x + torch.sqrt(x * x + epsilon)) / 2.0
 
 
@@ -33,7 +38,7 @@ class GLES(nn.Module):
               must be 'undirected' or 'directed'. Defaultly set to 'undirected'.
     """
 
-    def __init__(self, num_nodes=None, expect_edges=None, lmbda=1, max_iter=5, mode="undirected"):
+    def __init__(self, num_nodes=None, expect_edges=None, lmbda=1, max_iter=10, mode="undirected"):
         super(GLES, self).__init__()
         self.mode = mode
         self.nodes = num_nodes
@@ -61,15 +66,17 @@ class GLES(nn.Module):
         
         theta = torch.norm(x[:, None, :] - x[None, :, :], dim=-1)
         gamma = torch.min(theta).requires_grad_()
-        graph = torch.ones(nodes, nodes).requires_grad_(False)
         for _ in range(self.max_iter):
             g = theta + gamma
             g = g - torch.diag_embed(torch.diag(g))
-            equ = torch.sum(SparsePlus(-g / (2.0 * self.lmbda))) - edges
-            grad = torch.autograd.grad(equ.sum(), gamma, create_graph=True)[0]
+            g = SquarePlus(-g / (2.0 * self.lmbda))
+            equ = g.sum() - edges
+            grad = torch.autograd.grad(equ, gamma, create_graph=True)[0]
             gamma = gamma - (equ / grad)
-            graph = F.relu(-g / (2.0 * self.lmbda)).detach().requires_grad_(False)
-            graph = graph - torch.diag_embed(torch.diag(graph))
+            
+        graph = theta + gamma
+        graph = F.relu( -graph / (2. * self.lmbda) )
+        graph = graph - torch.diag_embed(torch.diag(graph))
 
         if self.mode == "undirected":
             graph = (graph + graph.T) / 2.0
@@ -98,7 +105,7 @@ class GLES_fc(nn.Module):
 
 if __name__ == "__main__":
     print("A Test of Correctness on Graph_Learning Layer.")
-    lmbda = 2.0
+    lmbda = 2.
     # x = [
     #         [1.0, 1.0, 1.0],  # feature of node 0
     #         [1.0, 1.1, 1.0],
@@ -109,8 +116,8 @@ if __name__ == "__main__":
     #         [-7.0, -7.0, -7.0],
     #         [-6.9, -7.1, -7.3],
     #     ]
-    x = torch.randn((13, 32 * 32))
     # x = torch.tensor(x)
+    x = torch.randn((13, 32 * 32))
     print(x)
 
     import time
