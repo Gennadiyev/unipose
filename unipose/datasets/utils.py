@@ -78,22 +78,44 @@ def crop_keypoints(keypoints: torch.Tensor, bbox_rounded: torch.Tensor, mask: to
     return keypoints_cropped
 
 
-def get_keypoints_images(keypoints: torch.Tensor, image_size: int, mask: torch.Tensor) -> torch.Tensor:
+def gaussian(x: torch.Tensor, y: torch.Tensor, mean_x: torch.Tensor, mean_y: torch.Tensor, sigma: float) -> torch.Tensor:
+    exp = torch.exp(-((x - mean_x) ** 2 + (y - mean_y) ** 2) / (2 * sigma ** 2))
+    denominator = 2 * torch.tensor(torch.pi) * sigma ** 2
+    return exp / denominator
+
+
+def apply_gaussian(image: torch.Tensor, mean_x: torch.Tensor, mean_y: torch.Tensor, sigma: float) -> torch.Tensor:
+    b, c, h, w = image.shape
+    x = torch.arange(0, w).repeat(h, 1).repeat(b, c, 1, 1).to(image.device)
+    y = torch.arange(0, h).repeat(w, 1).t().repeat(b, c, 1, 1).to(image.device)
+    mean_x = mean_x.reshape(b, c, 1, 1).repeat(1, 1, h, w)
+    mean_y = mean_y.reshape(b, c, 1, 1).repeat(1, 1, h, w)
+    # print("mean_x", mean_x)
+    # print("mean_y", mean_y)
+    image = gaussian(x, y, mean_x, mean_y, sigma)
+    return image
+
+
+def get_keypoints_images(keypoints: torch.Tensor, image_size: int, mask: torch.Tensor, sigma: float) -> torch.Tensor:
     """Generate the images of the keypoints.
     
     @param keypoints: A tensor of shape (batchsize, num_keypoints, 2) containing the keypoints.
     @param image_size: The size of the image.
+    @param mask: A tensor of shape (batchsize, num_keypoints) containing the mask.
+    @param sigma: The sigma of the gaussian.
     @return: A tensor of shape (batchsize, num_keypoints, image_size, image_size) containing the images of the keypoints.
     """
     batchsize, num_keypoints, _ = keypoints.shape
     images = torch.zeros(batchsize, num_keypoints, image_size, image_size).to(keypoints.device)
     keypoints_multiplied = keypoints.clone()
     keypoints_multiplied *= image_size
-    keypoints_rounded = torch.round(keypoints_multiplied).long().clamp(0, image_size - 1)
-    for i in range(batchsize):
-        for j in range(num_keypoints):
-            images[i, j, keypoints_rounded[i, j, 1], keypoints_rounded[i, j, 0]] = 1
+    # print(images.shape, keypoints_multiplied[:, :, 0].shape, keypoints_multiplied[:, :, 1].shape, sigma)
+    # print("keypoints_multiplied", keypoints_multiplied)
+    images = apply_gaussian(images, keypoints_multiplied[:, :, 0], keypoints_multiplied[:, :, 1], sigma=sigma)
+    # Apply masking again
     images = images.mul(mask.unsqueeze(2).unsqueeze(3).float())
+    # Finalize with a global multiplier
+    images = images.mul(16)
     return images
 
 
@@ -105,7 +127,7 @@ def process_batch(image: torch.Tensor, bbox: torch.Tensor, keypoints: torch.Tens
     @param keypoints: A tensor of shape (batchsize, num_keypoints, 2) containing the keypoints.
     @param label_mask: A tensor of shape (batchsize, num_keypoints) containing the mask.
     @param image_size: The size to which the image should be resized.
-    @param scale_factor: The factor by which the image should be scaled down, which is determined by the model.
+    @param scale_factor: Patch size of output keypoint heatmaps. Must be 4 the default Unipose model is used without modification.
     @return: A list of tensors containing the cropped and resized image and the images of the keypoints.
     """
     bbox_enlarged = enlarge_bounding_box(bbox)
@@ -114,9 +136,9 @@ def process_batch(image: torch.Tensor, bbox: torch.Tensor, keypoints: torch.Tens
     # print(f"{bbox_rounded=}")
     image_cropped = crop_image(image, bbox_rounded, image_size)
     # print(f"{image_cropped.shape=}")
-    keypoints_cropped = crop_keypoints(keypoints, bbox_rounded, label_mask)
+    keypoints_cropped = crop_keypoints(keypoints.float(), bbox_rounded.float(), label_mask)
     # print(f"{keypoints=}")
     # print(f"{keypoints_cropped=}")
-    keypoints_images = get_keypoints_images(keypoints_cropped, image_size // scale_factor, label_mask)
+    keypoints_images = get_keypoints_images(keypoints_cropped, image_size // scale_factor, label_mask, scale_factor)
     # print(f"{keypoints_images.shape=}")
     return [image_cropped, keypoints_images]

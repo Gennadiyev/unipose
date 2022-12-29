@@ -77,7 +77,6 @@ class AnimalKingdomDataset(BaseJointDataset):
         # train_test, area, scale, center, bbox, iscrowd, num_keypoints, keypoints
         
         # Extract information
-        # Extract information
         keypoints = ann["keypoints"]
         num_keypoints = ann["num_keypoints"]
         bbox = ann["bbox"]
