@@ -19,21 +19,22 @@
 
 ## Usage
 
-(Coming soon)
+A front-end server supporting API calls is planned for the future. For now, see [`scripts/vis_graph.py`](scripts/vis_graph.py) for an example of how to use the model.
 
 ## Pretrained Models
 
-(Coming soon)
+| Model | Specialty |
+| --- | --- |
+| [`model_run-5dd8_ep-60.pth`](https://drive.google.com/drive/folders/1eJ9RyLHcezrxE02uHBNmrI0Wxg4OPkfQ?usp=sharing) | Generalized model for all tetrapods (humans and animals) |
 
 ## Evaluation
 
-(Coming soon)
+(Coming soon, but you can refer to `scripts/test.py`.)
 
 ## Maintainers
 
-- [Gennadiyev](https://github.com/Gennadiyev)
-- []()
-- []()
+- [Yikun Ji (Kunologist)](https://github.com/Gennadiyev)
+- [Qi Fan (fanqiNO1)](https://github.com/fanqiNO1)
 
 ## Contributing
 
