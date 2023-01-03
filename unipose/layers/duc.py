@@ -12,7 +12,7 @@ class DUC(nn.Module):
             layers.append(nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1, bias=False))
             layers.append(nn.BatchNorm2d(in_channels, momentum=0.1))
             layers.append(nn.ReLU(inplace=True))
-        
+
         layers.append(nn.Conv2d(in_channels, channels, kernel_size=3, padding=1, bias=False))
         layers.append(nn.BatchNorm2d(channels, momentum=0.1))
         layers.append(nn.ReLU(inplace=True))
@@ -24,5 +24,6 @@ class DUC(nn.Module):
 
 if __name__ == "__main__":
     from torchinfo import summary
+
     model = DUC(64, 256, 2, 3)
     summary(model, input_size=(1, 64, 4, 4))

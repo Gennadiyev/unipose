@@ -10,6 +10,6 @@ dataloader = dataset.make_dataloader(batch_size=1, shuffle=True)
 for i, d in enumerate(dataloader):
     images = d["images"]
     kp_images = d["keypoint_images"]
-    image_arr = d["images"].cpu().detach().numpy() # (1, 3, 256, 256)
+    image_arr = d["images"].cpu().detach().numpy()  # (1, 3, 256, 256)
     draw_skel(image_arr, kp_images, "output.png")
-    break 
+    break

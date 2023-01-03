@@ -48,9 +48,9 @@ class BottleneckX(nn.Module):
 
 if __name__ == "__main__":
     from torchinfo import summary
+
     downsample = nn.Sequential(
-        nn.Conv2d(3, 256, kernel_size=1, stride=2, bias=False),
-        nn.BatchNorm2d(256, momentum=0.1)
+        nn.Conv2d(3, 256, kernel_size=1, stride=2, bias=False), nn.BatchNorm2d(256, momentum=0.1)
     )
     model = BottleneckX(3, 64, stride=2, groups=16, downsample=downsample, reduction=16)
     summary(model, input_size=(1, 3, 256, 256), depth=10)

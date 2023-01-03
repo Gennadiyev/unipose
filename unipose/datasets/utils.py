@@ -7,7 +7,7 @@ import torch
 
 def enlarge_bounding_box(bbox: torch.Tensor) -> torch.Tensor:
     """Enlarge the bounding box to the smallest square that contains it without changing its center.
-    
+
     @param bbox: A tensor of shape (4) containing the bounding box in the format [x, y, w, h].
     @return: A tensor of shape (4) containing the enlarged bounding box in the format [x1, y1, w1, h1].
     """
@@ -28,7 +28,7 @@ def enlarge_bounding_box(bbox: torch.Tensor) -> torch.Tensor:
 
 def crop_image(image: torch.Tensor, bbox_rounded: torch.Tensor, image_size: int) -> torch.Tensor:
     """Crop the image to the bounding box and resize it to the given size.
-    
+
     @param image: A tensor of shape (batchsize, channels, height, width) containing the image.
     @param bbox_rounded: A tensor of shape (batchsize, 4) containing the bounding box in the format [x, y, w, h].
     @param image_size: The size to which the image should be resized.
@@ -41,18 +41,19 @@ def crop_image(image: torch.Tensor, bbox_rounded: torch.Tensor, image_size: int)
         #                             bbox_rounded[i, 0]:bbox_rounded[i, 0] + bbox_rounded[i, 2]]
         # print(image_cropped.shape)
         # image_resized[i, :, :, :] = F.interpolate(image_cropped.unsqueeze(0), size=(image_size, image_size), mode='area').squeeze(0)
-        point1 = np.array([
-            [bbox_rounded[i, 0].item(), bbox_rounded[i, 1].item()],
-            [bbox_rounded[i, 0].item(), bbox_rounded[i, 1].item() + bbox_rounded[i, 3].item()],
-            [bbox_rounded[i, 0].item() + bbox_rounded[i, 2].item(), bbox_rounded[i, 1].item() + bbox_rounded[i, 3].item()],
-            [bbox_rounded[i, 0].item() + bbox_rounded[i, 2].item(), bbox_rounded[i, 1].item()]
-        ], dtype=np.float32)
-        point2 = np.array([
-            [0, 0],
-            [0, image_size],
-            [image_size, image_size],
-            [image_size, 0]
-        ], dtype=np.float32)
+        point1 = np.array(
+            [
+                [bbox_rounded[i, 0].item(), bbox_rounded[i, 1].item()],
+                [bbox_rounded[i, 0].item(), bbox_rounded[i, 1].item() + bbox_rounded[i, 3].item()],
+                [
+                    bbox_rounded[i, 0].item() + bbox_rounded[i, 2].item(),
+                    bbox_rounded[i, 1].item() + bbox_rounded[i, 3].item(),
+                ],
+                [bbox_rounded[i, 0].item() + bbox_rounded[i, 2].item(), bbox_rounded[i, 1].item()],
+            ],
+            dtype=np.float32,
+        )
+        point2 = np.array([[0, 0], [0, image_size], [image_size, image_size], [image_size, 0]], dtype=np.float32)
         M = cv2.getPerspectiveTransform(point1, point2)
         image_cropped = cv2.warpPerspective(image[i].cpu().permute(1, 2, 0).numpy(), M, (image_size, image_size))
         image_resized[i] = torch.from_numpy(image_cropped).permute(2, 0, 1)
@@ -62,7 +63,7 @@ def crop_image(image: torch.Tensor, bbox_rounded: torch.Tensor, image_size: int)
 
 def crop_keypoints(keypoints: torch.Tensor, bbox_rounded: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
     """Crop the keypoints to the bounding box.
-    
+
     @param keypoints: A tensor of shape (batchsize, num_keypoints, 2) containing the keypoints.
     @param bbox: A tensor of shape (batchsize, 4) containing the bounding box in the format [x, y, w, h].
     @param mask: A tensor of shape (batchsize, num_keypoints) containing the mask.
@@ -78,9 +79,11 @@ def crop_keypoints(keypoints: torch.Tensor, bbox_rounded: torch.Tensor, mask: to
     return keypoints_cropped
 
 
-def gaussian(x: torch.Tensor, y: torch.Tensor, mean_x: torch.Tensor, mean_y: torch.Tensor, sigma: float) -> torch.Tensor:
-    exp = torch.exp(-((x - mean_x) ** 2 + (y - mean_y) ** 2) / (2 * sigma ** 2))
-    denominator = 2 * torch.tensor(torch.pi) * sigma ** 2
+def gaussian(
+    x: torch.Tensor, y: torch.Tensor, mean_x: torch.Tensor, mean_y: torch.Tensor, sigma: float
+) -> torch.Tensor:
+    exp = torch.exp(-((x - mean_x) ** 2 + (y - mean_y) ** 2) / (2 * sigma**2))
+    denominator = 2 * torch.tensor(torch.pi) * sigma**2
     return exp / denominator
 
 
@@ -98,7 +101,7 @@ def apply_gaussian(image: torch.Tensor, mean_x: torch.Tensor, mean_y: torch.Tens
 
 def get_keypoints_images(keypoints: torch.Tensor, image_size: int, mask: torch.Tensor, sigma: float) -> torch.Tensor:
     """Generate the images of the keypoints.
-    
+
     @param keypoints: A tensor of shape (batchsize, num_keypoints, 2) containing the keypoints.
     @param image_size: The size of the image.
     @param mask: A tensor of shape (batchsize, num_keypoints) containing the mask.
@@ -119,9 +122,16 @@ def get_keypoints_images(keypoints: torch.Tensor, image_size: int, mask: torch.T
     return images
 
 
-def process_batch(image: torch.Tensor, bbox: torch.Tensor, keypoints: torch.Tensor, label_mask: torch.Tensor, image_size: int, scale_factor: int) -> List[torch.Tensor]:
+def process_batch(
+    image: torch.Tensor,
+    bbox: torch.Tensor,
+    keypoints: torch.Tensor,
+    label_mask: torch.Tensor,
+    image_size: int,
+    scale_factor: int,
+) -> List[torch.Tensor]:
     """Process a batch of data.
-    
+
     @param image: A tensor of shape (batchsize, channels, height, width) containing the image.
     @param bbox: A tensor of shape (batchsize, 4) containing the bounding box in the format [x, y, w, h].
     @param keypoints: A tensor of shape (batchsize, num_keypoints, 2) containing the keypoints.

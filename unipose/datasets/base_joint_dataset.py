@@ -141,4 +141,3 @@ class ConcatJointDataset(ConcatDataset):
             }
 
         return DataLoader(self, *args, **kwargs, collate_fn=collate_fn_for_unipose)
-

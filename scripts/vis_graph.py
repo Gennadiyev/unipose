@@ -37,6 +37,8 @@ cwd = os.getcwd()
 if os.path.basename(cwd) == "scripts":
     cwd = os.path.dirname(cwd)
     logger.warning("Running from scripts folder. Directories should be relative to {}", cwd)
+
+
 def get_abs_path(dir_path: str, create_if_not_exists: bool = False):
     """Gets the absolute path of any path: relative or absolute."""
     if not os.path.isabs(dir_path):
@@ -49,6 +51,7 @@ def get_abs_path(dir_path: str, create_if_not_exists: bool = False):
             os.makedirs(dir_path, exist_ok=True)
         return dir_path
 
+
 def create_gif(arr_of_image_paths: List[str], output_path: str):
     """Creates a gif from a list of image paths."""
     images = []
@@ -56,15 +59,20 @@ def create_gif(arr_of_image_paths: List[str], output_path: str):
         images.append(imageio.imread(filename))
     imageio.mimsave(output_path, images, duration=0.1)
 
+
 @logger.catch
-def draw_skel(src_image_path_or_arr: Union[str, np.ndarray], heatmaps: torch.Tensor, render_path: str, threshold: float=0):
+def draw_skel(
+    src_image_path_or_arr: Union[str, np.ndarray], heatmaps: torch.Tensor, render_path: str, threshold: float = 0
+):
     """Draws the skeleton on the image."""
     if isinstance(src_image_path_or_arr, str):
         base_image = Image.open(src_image_path_or_arr)
     elif isinstance(src_image_path_or_arr, np.ndarray):
         # If the shape is 4 (bz, 3, h, w), then take the first one and convert to (h, w, 3)
         if len(src_image_path_or_arr.shape) == 4:
-            logger.debug("Shape has length 4, assuming (bz, 3, h, w). Taking the first one and converting to (h, w, 3).")
+            logger.debug(
+                "Shape has length 4, assuming (bz, 3, h, w). Taking the first one and converting to (h, w, 3)."
+            )
             src_image_path_or_arr = src_image_path_or_arr[0].transpose(1, 2, 0)
         # If all the values are between 0 and 1, then multiply by 255
         if np.max(src_image_path_or_arr) <= 1:
@@ -97,11 +105,11 @@ def draw_skel(src_image_path_or_arr: Union[str, np.ndarray], heatmaps: torch.Ten
             "leg_left": "#fc906c",
             "leg_right": "#ccbf0e",
             "shadow": "#e54bd6",
-            "border": "#ffffff"
+            "border": "#ffffff",
         },
         "radius": 7,
         "line_width": 3,
-        "caption": True
+        "caption": True,
     }
     __radius = draw_config["radius"]
     __line_width = draw_config["line_width"]
@@ -123,7 +131,7 @@ def draw_skel(src_image_path_or_arr: Union[str, np.ndarray], heatmaps: torch.Ten
             confidence.append(conf)
     if sum(x) == 0 and sum(y) == 0:
         logger.warning("No keypoints in heatmaps: All keypoints are (0, 0). Will not render skeleton.")
-        
+
     # Draw lines between joints
     eps = 1e-6
     if (x[1] + y[1] > eps) and (x[2] + y[2] > eps):
@@ -149,24 +157,56 @@ def draw_skel(src_image_path_or_arr: Union[str, np.ndarray], heatmaps: torch.Ten
             continue
         if i in [0]:
             # Head
-            base_image_draw.ellipse((x[i]-__radius, y[i]-__radius, x[i]+__radius, y[i]+__radius), fill=__colors["head"], outline=__colors["border"])
+            base_image_draw.ellipse(
+                (x[i] - __radius, y[i] - __radius, x[i] + __radius, y[i] + __radius),
+                fill=__colors["head"],
+                outline=__colors["border"],
+            )
         elif i in [1, 2, 3]:
             # Left arm
-            base_image_draw.ellipse((x[i]-__radius, y[i]-__radius, x[i]+__radius, y[i]+__radius), fill=__colors["arm_left"], outline=__colors["border"])
+            base_image_draw.ellipse(
+                (x[i] - __radius, y[i] - __radius, x[i] + __radius, y[i] + __radius),
+                fill=__colors["arm_left"],
+                outline=__colors["border"],
+            )
         elif i in [4, 5, 6]:
             # Right arm
-            base_image_draw.ellipse((x[i]-__radius, y[i]-__radius, x[i]+__radius, y[i]+__radius), fill=__colors["arm_right"], outline=__colors["border"])
+            base_image_draw.ellipse(
+                (x[i] - __radius, y[i] - __radius, x[i] + __radius, y[i] + __radius),
+                fill=__colors["arm_right"],
+                outline=__colors["border"],
+            )
         elif i in [7, 8, 9]:
             # Left leg
-            base_image_draw.ellipse((x[i]-__radius, y[i]-__radius, x[i]+__radius, y[i]+__radius), fill=__colors["leg_left"], outline=__colors["border"])
+            base_image_draw.ellipse(
+                (x[i] - __radius, y[i] - __radius, x[i] + __radius, y[i] + __radius),
+                fill=__colors["leg_left"],
+                outline=__colors["border"],
+            )
         elif i in [10, 11, 12]:
             # Right leg
-            base_image_draw.ellipse((x[i]-__radius, y[i]-__radius, x[i]+__radius, y[i]+__radius), fill=__colors["leg_right"], outline=__colors["border"])
+            base_image_draw.ellipse(
+                (x[i] - __radius, y[i] - __radius, x[i] + __radius, y[i] + __radius),
+                fill=__colors["leg_right"],
+                outline=__colors["border"],
+            )
         if __caption:
             if x[i] < OUTPUT_SIZE - 160 and y[i] < OUTPUT_SIZE - 20:
-                base_image_draw.text((x[i]+__radius, y[i]+__radius), "{:.2f}@{}".format(confidence[i], i), fill="white", font=__font, anchor="la")
+                base_image_draw.text(
+                    (x[i] + __radius, y[i] + __radius),
+                    "{:.2f}@{}".format(confidence[i], i),
+                    fill="white",
+                    font=__font,
+                    anchor="la",
+                )
             else:
-                base_image_draw.text((x[i]-__radius, y[i]-__radius), "{:.2f}@{}".format(confidence[i], i), fill="white", font=__font, anchor="rs")
+                base_image_draw.text(
+                    (x[i] - __radius, y[i] - __radius),
+                    "{:.2f}@{}".format(confidence[i], i),
+                    fill="white",
+                    font=__font,
+                    anchor="rs",
+                )
 
     # Draw shadow points (mid of point 1 and 4; mid of point 7 and 10)
     mid_1_x, mid_1_y = (x[1] + x[4]) // 2, (y[1] + y[4]) // 2
@@ -182,11 +222,22 @@ if __name__ == "__main__":
     parser.add_argument("--image_path", type=str, help="Path to the image to be processed")
     parser.add_argument("--dataset", type=str, help="Sample from a dataset. Options: 'coco', 'mpii', 'animal_kingdom'")
     parser.add_argument("--dataset_path", type=str, help="Path to the dataset. Required if --dataset is specified")
-    parser.add_argument("--ak_class", type=str, help="Class of animal to sample from Animal Kingdom dataset", required=False, default="ak_P3_mammal")
+    parser.add_argument(
+        "--ak_class",
+        type=str,
+        help="Class of animal to sample from Animal Kingdom dataset",
+        required=False,
+        default="ak_P3_mammal",
+    )
     parser.add_argument("--checkpoint", type=str, default="exp/model-latest.pth")
     parser.add_argument("--gpu", type=int, default=0, help="GPU ID. Set to -1 to use CPU")
     parser.add_argument("--image_size", type=int, default=256, help="Image size of input image.")
-    parser.add_argument("--scale_factor", type=int, default=4, help="Patch size of output keypoint heatmaps. Must be 4 if Unipose is used without modification")
+    parser.add_argument(
+        "--scale_factor",
+        type=int,
+        default=4,
+        help="Patch size of output keypoint heatmaps. Must be 4 if Unipose is used without modification",
+    )
     parser.add_argument("--output_dir", type=str, default="exp/output_vis")
     parser.add_argument("--threshold", type=float, default=0.02, help="Threshold for keypoint confidence")
     args = parser.parse_args()
@@ -208,11 +259,21 @@ if __name__ == "__main__":
             exit(1)
         mode = "image"
         if os.path.isdir(image_path):
-            image_paths = [os.path.join(image_path, f) for f in os.listdir(image_path) if os.path.isfile(os.path.join(image_path, f)) and (f.endswith(".jpg") or f.endswith(".png"))]
-            logger.warning("A directory of image is given. This is an experimental feature! Will process {} images", len(image_paths))
+            image_paths = [
+                os.path.join(image_path, f)
+                for f in os.listdir(image_path)
+                if os.path.isfile(os.path.join(image_path, f)) and (f.endswith(".jpg") or f.endswith(".png"))
+            ]
+            logger.warning(
+                "A directory of image is given. This is an experimental feature! Will process {} images",
+                len(image_paths),
+            )
             # If the image naming follows a video naming convention, sort the images by frame number
             try:
-                image_paths = sorted(image_paths, key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split("_")[-1].split("-")[-1]))
+                image_paths = sorted(
+                    image_paths,
+                    key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split("_")[-1].split("-")[-1]),
+                )
                 logger.success("Successfully sorted images by frame number")
             except:
                 logger.warning("Images do not follow a video naming convention (e.g. video_1-001.jpg)")
@@ -220,14 +281,24 @@ if __name__ == "__main__":
     elif args.dataset is not None:
         # Get random image from dataset
         if args.dataset == "coco":
-            dataset_path = get_abs_path("datasets/coco") if args.dataset_path is None else get_abs_path(args.dataset_path)
+            dataset_path = (
+                get_abs_path("datasets/coco") if args.dataset_path is None else get_abs_path(args.dataset_path)
+            )
             dataloader = COCODataset(dataset_path).make_dataloader(batch_size=1, shuffle=True)
         elif args.dataset == "mpii":
-            dataset_path = get_abs_path("datasets/mpii") if args.dataset_path is None else get_abs_path(args.dataset_path)
+            dataset_path = (
+                get_abs_path("datasets/mpii") if args.dataset_path is None else get_abs_path(args.dataset_path)
+            )
             dataloader = MPIIDataset(dataset_path).make_dataloader(batch_size=1, shuffle=True)
         elif args.dataset == "animal_kingdom":
-            dataset_path = get_abs_path("datasets/animal_kingdom") if args.dataset_path is None else get_abs_path(args.dataset_path)
-            dataloader = AnimalKingdomDataset(dataset_path, sub_category=args.ak_class).make_dataloader(batch_size=1, shuffle=True)
+            dataset_path = (
+                get_abs_path("datasets/animal_kingdom")
+                if args.dataset_path is None
+                else get_abs_path(args.dataset_path)
+            )
+            dataloader = AnimalKingdomDataset(dataset_path, sub_category=args.ak_class).make_dataloader(
+                batch_size=1, shuffle=True
+            )
         else:
             logger.error("Unknown dataset: {}".format(args.dataset))
             exit(1)
@@ -245,11 +316,12 @@ if __name__ == "__main__":
     model = model.to(device)
     logger.info("Loading checkpoint from {}...", checkpoint_path)
     model.load_state_dict(torch.load(checkpoint_path, map_location=device))
-    
+
     # Copy source image to output directory
     if mode == "image":
         output_image_path = os.path.join(output_dir, os.path.basename(image_path))
         import shutil
+
         try:
             shutil.copyfile(image_path, output_image_path)
             logger.info("Copied source image to {}", output_image_path)
@@ -257,11 +329,11 @@ if __name__ == "__main__":
             logger.warning("Cannot copy source image to {}", output_image_path)
             logger.warning(e)
         image_path_or_tensor = image_path
-        
+
         # Inference
         logger.info("Processing image...")
         ret = inference(image_path_or_tensor, model, device=device)
-        
+
         # Render skeleton image
         skel_path = os.path.join(output_dir, "skel.png")
         draw_skel(image_path, ret, skel_path, threshold=args.threshold)
@@ -272,9 +344,9 @@ if __name__ == "__main__":
         for batch in dataloader:
             image_tensor = batch["images"]
             image_array_src = image_tensor.cpu().detach().numpy()
-            image_array = image_array_src[0].transpose(1, 2, 0) # (C, H, W) -> (H, W, C)
+            image_array = image_array_src[0].transpose(1, 2, 0)  # (C, H, W) -> (H, W, C)
             # image_array = image_array[:, :, ::-1] # BGR -> RGB
-            image_array = image_array * 255 # [0, 1] -> [0, 255]
+            image_array = image_array * 255  # [0, 1] -> [0, 255]
             image_path = os.path.join(output_dir, "source.png")
             image = Image.fromarray(image_array.astype(np.uint8))
             image.save(image_path)
@@ -289,12 +361,12 @@ if __name__ == "__main__":
         # Inference
         logger.info("Processing image...")
         ret = inference(image_path_or_tensor, model, device=device)
-        
+
         # Render skeleton image
         skel_path = os.path.join(output_dir, "skel.png")
         draw_skel(image_path, ret, skel_path, threshold=args.threshold)
         logger.info("Skeleton image saved to {}".format(skel_path))
-    
+
     elif mode == "directory":
         skeleton_images = []
         for idx, image_path in tqdm(enumerate(image_paths)):
@@ -309,5 +381,3 @@ if __name__ == "__main__":
         logger.info("Creating GIF from skeleton images...")
         create_gif(skeleton_images, gif_path)
         logger.info("Skeleton GIF saved to {}".format(gif_path))
-    
-    

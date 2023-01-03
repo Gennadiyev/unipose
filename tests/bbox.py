@@ -28,6 +28,7 @@ def test_enlarge_bbox_batch():
 @pytest.mark.contains_absolute_path
 def test_process_batch():
     from PIL import Image, ImageDraw
+
     image = Image.open("/home/dl2022/d3d/unipose/datasets/mpii/images/000142573.jpg")
     bbox = torch.tensor([[400.0, 200.0, 120.0, 160.0]])
     keypoints = torch.tensor([[[500.0, 300.0], [450.0, 350.0]]])
@@ -52,7 +53,7 @@ def test_process_batch():
         )
     image_with_bbox.save("cache/test_process_batch_with_bbox.png")
     del imdraw
-    
+
     image_after_crop = Image.fromarray(image_cropped.numpy().transpose(0, 2, 3, 1)[0].astype("uint8"))
     imdraw = ImageDraw.Draw(image_after_crop)
-    image_after_crop.save("cache/test_process_batch_after_crop.png")    
+    image_after_crop.save("cache/test_process_batch_after_crop.png")

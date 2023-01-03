@@ -26,9 +26,9 @@ class SEResNeXt(nn.Module):
         if stride != 1 or self.channels != channels * 4:
             downsample = nn.Sequential(
                 nn.Conv2d(self.channels, channels * 4, kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(channels * 4, momentum=0.1)
+                nn.BatchNorm2d(channels * 4, momentum=0.1),
             )
-        
+
         layers = []
         if downsample is not None:
             layers.append(
@@ -38,7 +38,7 @@ class SEResNeXt(nn.Module):
                     stride=stride,
                     groups=self.groups,
                     downsample=downsample,
-                    reduction=self.reduction
+                    reduction=self.reduction,
                 )
             )
         else:
@@ -49,7 +49,7 @@ class SEResNeXt(nn.Module):
                     stride=stride,
                     groups=self.groups,
                     downsample=downsample,
-                    reduction=None
+                    reduction=None,
                 )
             )
         self.channels = channels * 4
@@ -61,7 +61,7 @@ class SEResNeXt(nn.Module):
                     stride=1,
                     groups=self.groups,
                     downsample=None,
-                    reduction=None
+                    reduction=None,
                 )
             )
         return nn.Sequential(*layers)
@@ -81,5 +81,6 @@ class SEResNeXt(nn.Module):
 
 if __name__ == "__main__":
     from torchinfo import summary
+
     model = SEResNeXt(channels=64, groups=32, reduction=16, layers=[2, 2, 2, 2])
     summary(model, input_size=(1, 3, 256, 256), depth=10)

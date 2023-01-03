@@ -2,6 +2,7 @@ import torch
 
 from unipose.losses import GLES
 
+
 def test_gles():
     _lambda = 2.0
     x = torch.randn((13, 32 * 32))

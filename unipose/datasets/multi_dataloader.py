@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 
 
 class MultiDataloader(DataLoader):
-    def __init__(self, dataloaders : List[DataLoader]):
+    def __init__(self, dataloaders: List[DataLoader]):
         self.dataloaders = dataloaders
 
     def __iter__(self):

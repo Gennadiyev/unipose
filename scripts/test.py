@@ -73,7 +73,6 @@ def distance_accuracy(output, keypoint_images, masks):
     return torch.mean(distance)
 
 
-
 @torch.no_grad()
 def test(model, dataloader, device, log_interval):
     model.eval()

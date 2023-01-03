@@ -10,7 +10,7 @@ class SELayer(nn.Module):
             nn.Linear(channels, channels // reduction),
             nn.ReLU(inplace=True),
             nn.Linear(channels // reduction, channels),
-            nn.Sigmoid()
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -22,6 +22,6 @@ class SELayer(nn.Module):
 
 if __name__ == "__main__":
     from torchinfo import summary
+
     model = SELayer(64)
     summary(model, input_size=(1, 64, 16, 16), depth=10)
-    

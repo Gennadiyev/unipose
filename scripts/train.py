@@ -66,6 +66,8 @@ cwd = os.getcwd()
 cwd = (
     os.path.dirname(cwd) if os.path.basename(cwd) == "scripts" else cwd
 )  # Because the train script runs from the scripts folder
+
+
 def get_abs_path(dir_path: str, create_if_not_exists: bool = False):
     """Gets the absolute path of any path: relative or absolute."""
     if not os.path.isabs(dir_path):
@@ -107,10 +109,12 @@ if __name__ == "__main__":
     output_dir = get_abs_path(args.output_dir, create_if_not_exists=True)
 
     # Log to file
-    logger_path = os.path.join(output_dir, "train_{}_run-{}.log".format(datetime.now().strftime("%m-%d_%H%M%S"), session_id))
+    logger_path = os.path.join(
+        output_dir, "train_{}_run-{}.log".format(datetime.now().strftime("%m-%d_%H%M%S"), session_id)
+    )
     logger.add(logger_path, level="DEBUG")
     logger.info("Logging to {}...", logger_path)
-    
+
     # Log complete command to file
     logger.info("Command: {}", " ".join(sys.argv))
 
@@ -145,6 +149,7 @@ if __name__ == "__main__":
     datasets = []
     logger.info("Loading datasets...")
     from unipose.datasets import AnimalKingdomDataset, MPIIDataset, COCODataset, ConcatJointDataset
+
     if args.animal_kingdom or args.all:
         _path = dataset_path.get("animal_kingdom")
         logger.debug("Loading Animal Kingdom dataset from {}...", _path)
@@ -169,7 +174,7 @@ if __name__ == "__main__":
         dataset = ConcatJointDataset(datasets)
     else:
         dataset = datasets[0]
-    
+
     dataloader = dataset.make_dataloader(
         image_size=args.image_size,
         scale_factor=args.scale_factor,
@@ -202,4 +207,3 @@ if __name__ == "__main__":
             # scheduler_path = os.path.join(output_dir, "scheduler_run-{}_ep-{}.pth".format(session_id, epoch + 1))
             # torch.save(scheduler.state_dict(), scheduler_path)
             # logger.info("Scheduler saved at {}", scheduler_path)
-
