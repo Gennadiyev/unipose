@@ -31,7 +31,6 @@ def inference(image_path_or_tensor, model, /, device=torch.device("cpu")):
     return output
 
 
-OUTPUT_SIZE = 1024
 cwd = os.getcwd()
 if os.path.basename(cwd) == "scripts":
     cwd = os.path.dirname(cwd)
@@ -61,7 +60,7 @@ def create_gif(arr_of_image_paths: List[str], output_path: str):
 
 @logger.catch
 def draw_skel(
-    src_image_path_or_arr: Union[str, np.ndarray], heatmaps: torch.Tensor, render_path: str, threshold: float = 0
+    src_image_path_or_arr: Union[str, np.ndarray], heatmaps: torch.Tensor, render_path: str, threshold: float = 0, output_size: int=1024
 ):
     """Draws the skeleton on the image."""
     if isinstance(src_image_path_or_arr, str):
@@ -87,7 +86,7 @@ def draw_skel(
         raise TypeError("src_image_path_or_arr must be either a string or a numpy array.")
     if base_image.mode != "RGB":
         base_image = base_image.convert("RGB")
-    base_image = base_image.resize((OUTPUT_SIZE, OUTPUT_SIZE), resample=Image.Resampling.BICUBIC)
+    base_image = base_image.resize((output_size, output_size), resample=Image.Resampling.BICUBIC)
     # Generate output
     x = []
     y = []
@@ -125,8 +124,8 @@ def draw_skel(
             y.append(0)
             confidence.append(0)
         else:
-            x.append(idx % _image_arr.shape[0] * OUTPUT_SIZE // _image_arr.shape[1])
-            y.append(idx // _image_arr.shape[0] * OUTPUT_SIZE // _image_arr.shape[0])
+            x.append(idx % _image_arr.shape[0] * output_size // _image_arr.shape[1])
+            y.append(idx // _image_arr.shape[0] * output_size // _image_arr.shape[0])
             confidence.append(conf)
     if sum(x) == 0 and sum(y) == 0:
         logger.warning("No keypoints in heatmaps: All keypoints are (0, 0). Will not render skeleton.")
@@ -137,7 +136,7 @@ def draw_skel(
         base_image_draw.line((x[1], y[1], x[2], y[2]), fill=__colors["arm_left"], width=__line_width)
     if (x[2] + y[2] > eps) and (x[3] + y[3] > eps):
         base_image_draw.line((x[2], y[2], x[3], y[3]), fill=__colors["arm_left"], width=__line_width)
-    if (x[4] + y[4] > eps) and (x[5] + y[5] > eps) and (x[6] + y[6] > eps):
+    if (x[4] + y[4] > eps) and (x[5] + y[5] > eps):
         base_image_draw.line((x[4], y[4], x[5], y[5]), fill=__colors["arm_right"], width=__line_width)
     if (x[5] + y[5] > eps) and (x[6] + y[6] > eps):
         base_image_draw.line((x[5], y[5], x[6], y[6]), fill=__colors["arm_right"], width=__line_width)
@@ -190,7 +189,7 @@ def draw_skel(
                 outline=__colors["border"],
             )
         if __caption:
-            if x[i] < OUTPUT_SIZE - 160 and y[i] < OUTPUT_SIZE - 20:
+            if x[i] < output_size - 160 and y[i] < output_size - 20:
                 base_image_draw.text(
                     (x[i] + __radius, y[i] + __radius),
                     "{:.2f}@{}".format(confidence[i], i),
@@ -239,6 +238,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--output_dir", type=str, default="exp/output_vis")
     parser.add_argument("--threshold", type=float, default=0.02, help="Threshold for keypoint confidence")
+    parser.add_argument("--output_size", type=int, default=1024, help="Size of the output image. Note that the landmarks are not scaled to fit the size.")
     args = parser.parse_args()
 
     output_dir = get_abs_path(args.output_dir, create_if_not_exists=True)
@@ -335,7 +335,7 @@ if __name__ == "__main__":
 
         # Render skeleton image
         skel_path = os.path.join(output_dir, "skel.png")
-        draw_skel(image_path, ret, skel_path, threshold=args.threshold)
+        draw_skel(image_path, ret, skel_path, threshold=args.threshold, output_size=args.output_size)
         logger.info("Skeleton image saved to {}".format(skel_path))
 
     elif mode == "dataset":
@@ -352,7 +352,7 @@ if __name__ == "__main__":
             logger.info("Saved source image to {}", image_path)
             kp_gt = batch["keypoint_images"]
             logger.debug("Drawing ground truth skeleton...")
-            draw_skel(image_array_src, kp_gt, os.path.join(output_dir, "gt.png"), threshold=args.threshold)
+            draw_skel(image_array_src, kp_gt, os.path.join(output_dir, "gt.png"), threshold=args.threshold, output_size=args.output_size)
             logger.info("Saved ground truth skeleton to {}", os.path.join(output_dir, "gt.png"))
             image_path_or_tensor = image_tensor
             break
@@ -363,7 +363,7 @@ if __name__ == "__main__":
 
         # Render skeleton image
         skel_path = os.path.join(output_dir, "skel.png")
-        draw_skel(image_path, ret, skel_path, threshold=args.threshold)
+        draw_skel(image_path, ret, skel_path, threshold=args.threshold, output_size=args.output_size)
         logger.info("Skeleton image saved to {}".format(skel_path))
 
     elif mode == "directory":
@@ -373,7 +373,7 @@ if __name__ == "__main__":
             ret = inference(image_path_or_tensor, model, device=device)
             # Render skeleton image
             skel_path = os.path.join(output_dir, "skel-{:06d}.png".format(idx))
-            draw_skel(image_path, ret, skel_path, threshold=args.threshold)
+            draw_skel(image_path, ret, skel_path, threshold=args.threshold, output_size=args.output_size)
             skeleton_images.append(skel_path)
         # Create a GIF output
         gif_path = os.path.join(output_dir, "skel.gif")
