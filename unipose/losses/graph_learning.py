@@ -38,7 +38,7 @@ class GLES(nn.Module):
               must be 'undirected' or 'directed'. Defaultly set to 'undirected'.
     """
 
-    def __init__(self, num_nodes=None, expect_edges=None, lmbda=1, max_iter=10, mode="undirected"):
+    def __init__(self, num_nodes=None, expect_edges=None, lmbda=2, max_iter=10, mode="undirected"):
         super(GLES, self).__init__()
         self.mode = mode
         self.nodes = num_nodes
@@ -47,7 +47,7 @@ class GLES(nn.Module):
         self.max_iter = max_iter
 
         if self.edges is None:
-            self.edges = lambda x: x * (int(log(x)) + 1)
+            self.edges = lambda x: x * (int(log(x)) + 1) ** 2
 
         if self.mode != "undirected" and self.mode != "directed":
             raise ValueError("GLES Error: mode must be 'undirected' or 'directed'.")
@@ -72,6 +72,8 @@ class GLES(nn.Module):
             g = SquarePlus(-g / (2.0 * self.lmbda))
             equ = g.sum() - edges
             grad = torch.autograd.grad(equ, gamma, create_graph=True)[0]
+            # Gradient Clipping. IMPORTANT!
+            grad = torch.clip(torch.abs(grad), min=1e-5) * torch.sign(grad)    
             gamma = gamma - (equ / grad)
 
         graph = theta + gamma
@@ -85,7 +87,7 @@ class GLES(nn.Module):
 
 
 class GLES_fc(nn.Module):
-    def __init__(self, num_features=32 * 32, num_nodes=None, expect_edges=None, lmbda=1, max_iter=5, mode="undirected"):
+    def __init__(self, num_features=32 * 32, num_nodes=None, expect_edges=None, lmbda=2, max_iter=5, mode="undirected"):
         super(GLES_fc, self).__init__()
         self.mode = mode
         self.nodes = num_nodes
@@ -117,6 +119,8 @@ if __name__ == "__main__":
     #         [-6.9, -7.1, -7.3],
     #     ]
     # x = torch.tensor(x)
+    # random_seed = 20230103
+    # torch.manual_seed(random_seed)
     x = torch.randn((13, 32 * 32))
     print(x)
 
@@ -126,4 +130,5 @@ if __name__ == "__main__":
     model = GLES(lmbda=lmbda)
     graph = model(x)
     print(graph)
+    print(graph.sum())
     print("Time: ", time.perf_counter() - start)
