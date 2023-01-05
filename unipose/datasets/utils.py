@@ -65,7 +65,7 @@ def crop_keypoints(keypoints: torch.Tensor, bbox_rounded: torch.Tensor, mask: to
     """Crop the keypoints to the bounding box.
 
     @param keypoints: A tensor of shape (batchsize, num_keypoints, 2) containing the keypoints.
-    @param bbox: A tensor of shape (batchsize, 4) containing the bounding box in the format [x, y, w, h].
+    @param bbox_rounded: A tensor of shape (batchsize, 4) containing the bounding box in the format [x, y, w, h].
     @param mask: A tensor of shape (batchsize, num_keypoints) containing the mask.
     @return: A tensor of shape (batchsize, num_keypoints, 3) containing the cropped keypoints.
     """

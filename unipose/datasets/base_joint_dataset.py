@@ -57,7 +57,7 @@ class BaseJointDataset(Dataset, ABC):
     def make_dataloader(self, image_size: int = 256, scale_factor: int = 4, *args, **kwargs):
         """Make a dataloader for the dataset.
 
-        A unipose dataset returns a dictionary with the following keys: "images", "keypoint_images", "masks", "extra_keypoints", "extra_tokens". See the L{docs/datasets.md} for more information.
+        A unipose dataset returns a dictionary with the following keys: "images", "keypoint_images", "masks", "extra_keypoints", "extra_tokens".
 
         @param image_size: The size of the image to resize to.
         @param scale_factor: The factor to scale the image by.
@@ -107,9 +107,9 @@ class ConcatJointDataset(ConcatDataset):
         super().__init__(datasets)
 
     def make_dataloader(self, image_size: int = 256, scale_factor: int = 4, *args, **kwargs):
-        """Make a dataloader for the dataset.
+        """Make a dataloader for the concat-ed dataset.
 
-        A unipose dataset returns a dictionary with the following keys: "images", "keypoint_images", "masks", "extra_keypoints", "extra_tokens". See the L{docs/datasets.md}
+        A unipose dataset returns a dictionary with the following keys: "images", "keypoint_images", "masks", "extra_keypoints", "extra_tokens".
         """
         if "collate_fn" in kwargs:
             raise ValueError("collate_fn should not be set for BaseJointDataset, a default is provided")
