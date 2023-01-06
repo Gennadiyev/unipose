@@ -4,7 +4,6 @@ import torch
 from unipose.datasets import COCODataset, AnimalKingdomDataset, MPIIDataset, AP10KDataset
 
 
-@pytest.mark.slow
 @pytest.mark.contains_absolute_path
 def test_coco():
     dataset = COCODataset("/home/dl2022/d3d/unipose/datasets/coco", split="train")
@@ -16,7 +15,6 @@ def test_coco():
     assert data["image"].shape[0] == 3
 
 
-@pytest.mark.slow
 @pytest.mark.contains_absolute_path
 def test_animal_kingdom():
     dataset = AnimalKingdomDataset(
