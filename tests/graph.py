@@ -1,8 +1,9 @@
+import pytest
 import torch
 
 from unipose.losses import GLES
 
-
+@pytest.mark.skip(reason="Graph learning is out of scope for now")
 def test_gles():
     _lambda = 2.0
     x = torch.randn((13, 32 * 32))

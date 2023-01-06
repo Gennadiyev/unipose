@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from unipose.datasets import COCODataset, AnimalKingdomDataset, MPIIDataset
+from unipose.datasets import COCODataset, AnimalKingdomDataset, MPIIDataset, AP10KDataset
 
 
 @pytest.mark.slow
@@ -33,6 +33,16 @@ def test_animal_kingdom():
 def test_mpii():
     dataset = MPIIDataset("/home/dl2022/d3d/unipose/datasets/mpii", split="train")
     assert len(dataset) == 22246
+    data = dataset[0]
+    assert data["unipose_keypoints"].shape == torch.Size([13, 2])
+    assert data["bounding_box"].shape == torch.Size([4])
+    assert data["image"].shape[0] == 3
+
+
+@pytest.mark.contains_absolute_path
+def test_ap10k():
+    dataset = AP10KDataset("/home/dl2022/d3d/unipose/datasets/ap10k", split="val")
+    assert len(dataset) == 995
     data = dataset[0]
     assert data["unipose_keypoints"].shape == torch.Size([13, 2])
     assert data["bounding_box"].shape == torch.Size([4])
