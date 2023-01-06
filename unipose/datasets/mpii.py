@@ -12,7 +12,7 @@ from .base_joint_dataset import BaseJointDataset
 class MPIIDataset(BaseJointDataset):
 
     MAPPING = {
-        0: 8,  # Nose
+        0: 8,  # Nose... Well, neck
         1: 13,  # Left shoulder
         2: 14,  # Left elbow
         3: 15,  # Left wrist
