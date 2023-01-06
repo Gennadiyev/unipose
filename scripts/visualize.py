@@ -3,19 +3,19 @@ import os
 from typing import List, Union
 import imageio.v2 as imageio
 from loguru import logger
+import random
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import torch
 from tqdm import tqdm
-from unipose.datasets.animal_kingdom import AnimalKingdomDataset
-from unipose.datasets.coco import COCODataset
-from unipose.datasets.mpii import MPIIDataset
+from unipose.datasets import MPIIDataset, COCODataset, AnimalKingdomDataset, AP10KDataset
 
 from unipose.models import UniPose
+import time
 
 
 def inference(image_path_or_tensor, model, /, device=torch.device("cpu")):
-    model.eval()
+    # model.eval() # should be unnecessary
     if isinstance(image_path_or_tensor, str):
         image = Image.open(image_path)
         image = image.resize((256, 256))
@@ -27,8 +27,10 @@ def inference(image_path_or_tensor, model, /, device=torch.device("cpu")):
     elif isinstance(image_path_or_tensor, torch.Tensor):
         image = image_path_or_tensor.to(device)
     with torch.no_grad():
+        tic = time.time()
         output = model(image)
-    return output
+        toc = time.time()
+    return output, toc - tic
 
 
 cwd = os.getcwd()
@@ -60,7 +62,11 @@ def create_gif(arr_of_image_paths: List[str], output_path: str):
 
 @logger.catch
 def draw_skel(
-    src_image_path_or_arr: Union[str, np.ndarray], heatmaps: torch.Tensor, render_path: str, threshold: float = 0, output_size: int=1024
+    src_image_path_or_arr: Union[str, np.ndarray],
+    heatmaps: torch.Tensor,
+    render_path: str,
+    threshold: float = 0,
+    output_size: int = 1024,
 ):
     """Draws the skeleton on the image."""
     if isinstance(src_image_path_or_arr, str):
@@ -238,7 +244,12 @@ if __name__ == "__main__":
     )
     parser.add_argument("--output_dir", type=str, default="exp/output_vis")
     parser.add_argument("--threshold", type=float, default=0.02, help="Threshold for keypoint confidence")
-    parser.add_argument("--output_size", type=int, default=1024, help="Size of the output image. Note that the landmarks are not scaled to fit the size.")
+    parser.add_argument(
+        "--output_size",
+        type=int,
+        default=1024,
+        help="Size of the output image. Note that the landmarks are not scaled to fit the size.",
+    )
     args = parser.parse_args()
 
     output_dir = get_abs_path(args.output_dir, create_if_not_exists=True)
@@ -283,21 +294,26 @@ if __name__ == "__main__":
             dataset_path = (
                 get_abs_path("datasets/coco") if args.dataset_path is None else get_abs_path(args.dataset_path)
             )
-            dataloader = COCODataset(dataset_path).make_dataloader(batch_size=1, shuffle=True)
+            dataloader = COCODataset(dataset_path, split="val").make_dataloader(batch_size=1, shuffle=True)
         elif args.dataset == "mpii":
             dataset_path = (
                 get_abs_path("datasets/mpii") if args.dataset_path is None else get_abs_path(args.dataset_path)
             )
-            dataloader = MPIIDataset(dataset_path).make_dataloader(batch_size=1, shuffle=True)
+            dataloader = MPIIDataset(dataset_path, split="val").make_dataloader(batch_size=1, shuffle=True)
         elif args.dataset == "animal_kingdom":
             dataset_path = (
                 get_abs_path("datasets/animal_kingdom")
                 if args.dataset_path is None
                 else get_abs_path(args.dataset_path)
             )
-            dataloader = AnimalKingdomDataset(dataset_path, sub_category=args.ak_class).make_dataloader(
+            dataloader = AnimalKingdomDataset(dataset_path, split="test", sub_category=args.ak_class).make_dataloader(
                 batch_size=1, shuffle=True
             )
+        elif args.dataset == "ap10k":
+            dataset_path = (
+                get_abs_path("datasets/ap10k") if args.dataset_path is None else get_abs_path(args.dataset_path)
+            )
+            dataloader = AP10KDataset(dataset_path, split="test", sub_split=random.randint(1, 3)).make_dataloader(batch_size=1, shuffle=True)
         else:
             logger.error("Unknown dataset: {}".format(args.dataset))
             exit(1)
@@ -331,12 +347,13 @@ if __name__ == "__main__":
 
         # Inference
         logger.info("Processing image...")
-        ret = inference(image_path_or_tensor, model, device=device)
+        ret, time_elapsed = inference(image_path_or_tensor, model, device=device)
+        logger.info("Time elapsed: {:.1f} ms".format(time_elapsed * 1000))
 
         # Render skeleton image
         skel_path = os.path.join(output_dir, "skel.png")
         draw_skel(image_path, ret, skel_path, threshold=args.threshold, output_size=args.output_size)
-        logger.info("Skeleton image saved to {}".format(skel_path))
+        logger.success("Skeleton image saved to {}".format(skel_path))
 
     elif mode == "dataset":
         # Sample from a dataloader
@@ -352,31 +369,43 @@ if __name__ == "__main__":
             logger.info("Saved source image to {}", image_path)
             kp_gt = batch["keypoint_images"]
             logger.debug("Drawing ground truth skeleton...")
-            draw_skel(image_array_src, kp_gt, os.path.join(output_dir, "gt.png"), threshold=args.threshold, output_size=args.output_size)
+            draw_skel(
+                image_array_src,
+                kp_gt,
+                os.path.join(output_dir, "gt.png"),
+                threshold=args.threshold,
+                output_size=args.output_size,
+            )
             logger.info("Saved ground truth skeleton to {}", os.path.join(output_dir, "gt.png"))
             image_path_or_tensor = image_tensor
             break
 
         # Inference
         logger.info("Processing image...")
-        ret = inference(image_path_or_tensor, model, device=device)
+        ret, time_elapsed = inference(image_path_or_tensor, model, device=device)
+        logger.info("Time elapsed: {:.1f} ms".format(time_elapsed * 1000))
 
         # Render skeleton image
         skel_path = os.path.join(output_dir, "skel.png")
         draw_skel(image_path, ret, skel_path, threshold=args.threshold, output_size=args.output_size)
-        logger.info("Skeleton image saved to {}".format(skel_path))
+        logger.success("Skeleton image saved to {}".format(skel_path))
 
     elif mode == "directory":
         skeleton_images = []
+        time_elapsed_stats = []
         for idx, image_path in tqdm(enumerate(image_paths)):
             image_path_or_tensor = image_path
-            ret = inference(image_path_or_tensor, model, device=device)
+            ret, time_elapsed = inference(image_path_or_tensor, model, device=device)
+            time_elapsed_stats.append(time_elapsed)
             # Render skeleton image
             skel_path = os.path.join(output_dir, "skel-{:06d}.png".format(idx))
             draw_skel(image_path, ret, skel_path, threshold=args.threshold, output_size=args.output_size)
             skeleton_images.append(skel_path)
+        time_elapsed_stats = np.array(time_elapsed_stats)
+        logger.info("Average time elapsed: {:.1f} ms".format(np.mean(time_elapsed_stats) * 1000))
+        logger.info("FPS: {:.2f}".format(1 / np.mean(time_elapsed_stats)))
         # Create a GIF output
         gif_path = os.path.join(output_dir, "skel.gif")
         logger.info("Creating GIF from skeleton images...")
         create_gif(skeleton_images, gif_path)
-        logger.info("Skeleton GIF saved to {}".format(gif_path))
+        logger.success("Skeleton GIF saved to {}".format(gif_path))
