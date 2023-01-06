@@ -12,19 +12,19 @@ from .base_joint_dataset import BaseJointDataset
 class AnimalKingdomDataset(BaseJointDataset):
 
     MAPPING = {
-        0: 3,  # Nose
-        1: 7,  # Left shoulder
-        2: 9,  # Left elbow
+        0: 3,   # Nose
+        1: 7,   # Left shoulder
+        2: 9,   # Left elbow
         3: 11,  # Left wrist
-        4: 8,  # Right shoulder
+        4: 8,   # Right shoulder
         5: 10,  # Right elbow
         6: 12,  # Right wrist
         7: 14,  # Left hip
         8: 16,  # Left knee
         9: 18,  # Left ankle
-        10: 15,  # Right hip
-        11: 17,  # Right knee
-        12: 19,  # Right ankle
+        10: 15, # Right hip
+        11: 17, # Right knee
+        12: 19, # Right ankle
     }
 
     EXTRA_TOKENS = {
