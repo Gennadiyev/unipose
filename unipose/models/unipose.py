@@ -6,8 +6,10 @@ from unipose.layers import DUC, SEResNeXt
 
 
 class UniPose(nn.Module):
+    """UniPose model.
+    """
     def __init__(
-        self, keypoint_number, channels=64, groups=32, reduction=16, resnet_layers=[2, 2, 2, 2], duc_layers=[4, 2, 1]
+        self, keypoint_count, channels=64, groups=32, reduction=16, resnet_layers=[2, 2, 2, 2], duc_layers=[4, 2, 1]
     ):
         super(UniPose, self).__init__()
         self.backbone = SEResNeXt(
@@ -42,7 +44,7 @@ class UniPose(nn.Module):
         self.duc2 = DUC(16 * channels, 8 * channels, upscale_factor=2, layer_number=duc_layers[1])
         self.duc3 = DUC(8 * channels, 4 * channels, upscale_factor=2, layer_number=duc_layers[2])
 
-        self.conv_out = nn.Conv2d(4 * channels, keypoint_number, kernel_size=3, stride=1, padding=1)
+        self.conv_out = nn.Conv2d(4 * channels, keypoint_count, kernel_size=3, stride=1, padding=1)
 
     def forward(self, x):
         x = self.backbone(x)
