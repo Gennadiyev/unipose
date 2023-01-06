@@ -13,5 +13,6 @@ from .base_joint_dataset import BaseJointDataset, ConcatJointDataset
 from .animal_kingdom import AnimalKingdomDataset
 from .coco import COCODataset
 from .mpii import MPIIDataset
+from .ap10k import AP10KDataset
 
-__all__ = ["COCODataset", "AnimalKingdomDataset", "MPIIDataset", "BaseJointDataset", "ConcatJointDataset"]
+__all__ = ["COCODataset", "AnimalKingdomDataset", "MPIIDataset", "AP10KDataset", "BaseJointDataset", "ConcatJointDataset"]
