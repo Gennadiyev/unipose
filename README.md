@@ -17,6 +17,16 @@
 - **Generalized model**: Unipose is a generalized model that can be applied to any tetrapod species.
 - **Code quality**: Unipose utilizes a modern python development toolchain using [poetry](https://python-poetry.org/) for packaging, [black](https://black.vercel.app/) for code style enforcement, [pytest](https://pytest.org/) for automated testing and [pydoctor](https://pydoctor.readthedocs.io/en/latest/) for documentation.
 
+## Installation
+
+The package is currently not published on PyPI. To install, clone the repository and run `pip install -e .` in the root directory:
+
+```bash
+git clone git@github.com:Gennadiyev/unipose.git
+cd unipose
+pip install -e .
+```
+
 ## Usage
 
 A front-end server supporting API calls is planned for the future. For now, see [`scripts/vis_graph.py`](scripts/vis_graph.py) for an example of how to use the model.
@@ -40,3 +50,8 @@ A front-end server supporting API calls is planned for the future. For now, see 
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
 
+## FAQ
+
+### Dataset issues
+
+We preprocessed the datasets and modified `pycocodataset` to support our use case. Specifically, we modified the `pycocotools/coco.py` file to use the faster `orjson` library and added support to discard all unlabelled images. See [this Gist](https://gist.github.com/6dfd1a37306ce5e621df219e03623a92.git) for the modified file.
