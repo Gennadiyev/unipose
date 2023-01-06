@@ -17,11 +17,14 @@ class BaseJointDataset(Dataset, ABC):
 
     @cvar MAPPING: Mapping from the dataset's keypoints to the unipose format, an OrderedDict of {index_in_unipose: index_in_dataset}.
     @cvar EXTRA_TOKENS: Extra tokens that are present in the dataset, an OrderedDict of {name: index_in_dataset}. These will be added to the batch if they are present in the mask.
+    @cvar SKELETON: Skeleton of the dataset, an OrderedDict of {name: list of indices_in_unipose that a limb consists of}.
     """
 
     MAPPING = OrderedDict({i: i for i in range(13)})
 
     EXTRA_TOKENS = OrderedDict()
+
+    SKELETON = OrderedDict()
 
     @abstractmethod
     def __init__(self):
@@ -75,6 +78,7 @@ class BaseJointDataset(Dataset, ABC):
             bounding_boxes = list([data["bounding_box"].unsqueeze(0) for data in batch])
             extra_keypoints = list([data["extra_keypoints"] for data in batch])
             extra_tokens = list([data["extra_tokens"] for data in batch])
+            skeleton = torch.tensor(list([data["skeleton"] for data in batch]))
             images_resized = []
             keypoint_images = []
             for i in range(len(batch)):
@@ -92,6 +96,7 @@ class BaseJointDataset(Dataset, ABC):
                 "masks": masks,
                 "extra_keypoints": extra_keypoints,
                 "extra_tokens": extra_tokens,
+                "skeleton": skeleton,
             }
 
         return DataLoader(self, *args, **kwargs, collate_fn=collate_fn_for_unipose)
@@ -121,6 +126,7 @@ class ConcatJointDataset(ConcatDataset):
             bounding_boxes = list([data["bounding_box"].unsqueeze(0) for data in batch])
             extra_keypoints = list([data["extra_keypoints"] for data in batch])
             extra_tokens = list([data["extra_tokens"] for data in batch])
+            skeleton = torch.tensor(list([data["skeleton"] for data in batch]))
             images_resized = []
             keypoint_images = []
             for i in range(len(batch)):
@@ -138,6 +144,7 @@ class ConcatJointDataset(ConcatDataset):
                 "masks": masks,
                 "extra_keypoints": extra_keypoints,
                 "extra_tokens": extra_tokens,
+                "skeleton": skeleton,
             }
 
         return DataLoader(self, *args, **kwargs, collate_fn=collate_fn_for_unipose)

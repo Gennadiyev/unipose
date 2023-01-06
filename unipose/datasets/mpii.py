@@ -29,6 +29,13 @@ class MPIIDataset(BaseJointDataset):
 
     EXTRA_TOKENS = {"pelvis": 6, "head_top": 9}
 
+    SKELETON = {
+        "left_fore_limb": [1, 2, 3],
+        "right_fore_limb": [4, 5, 6],
+        "left_hind_limb": [7, 8, 9],
+        "right_hind_limb": [10, 11, 12],
+    }
+    
     def __init__(self, path: str, split: Literal["train", "val"] = "train"):
         if split not in ["train", "val"]:
             raise ValueError(f"Invalid split {split} (must be 'train' or 'val')")
@@ -73,6 +80,7 @@ class MPIIDataset(BaseJointDataset):
 
         # Apply mapping
         keypoints_unipose, mask_unipose, extra_keypoints, extra_token_names = self._apply_mapping(keypoints, mask)
+        skeleton = [self.SKELETON[_] for _ in self.SKELETON]
 
         return {
             "image": image,
@@ -81,6 +89,7 @@ class MPIIDataset(BaseJointDataset):
             "unipose_mask": mask_unipose,
             "extra_keypoints": extra_keypoints,
             "extra_tokens": extra_token_names,
+            "skeleton": skeleton,
         }
 
     def __len__(self):
