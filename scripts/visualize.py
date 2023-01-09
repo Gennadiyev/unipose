@@ -17,7 +17,7 @@ import time
 def inference(image_path_or_tensor, model, /, device=torch.device("cpu")):
     # model.eval() # should be unnecessary
     if isinstance(image_path_or_tensor, str):
-        image = Image.open(image_path)
+        image = Image.open(image_path_or_tensor)
         image = image.resize((256, 256))
         image = np.array(image)
         # remove alpha channel
@@ -275,7 +275,7 @@ if __name__ == "__main__":
                 if os.path.isfile(os.path.join(image_path, f)) and (f.endswith(".jpg") or f.endswith(".png"))
             ]
             logger.warning(
-                "A directory of image is given. This is an experimental feature! Will process {} images",
+                "A directory of images is given. This is an experimental feature!",
                 len(image_paths),
             )
             # If the image naming follows a video naming convention, sort the images by frame number
@@ -286,7 +286,11 @@ if __name__ == "__main__":
                 )
                 logger.success("Successfully sorted images by frame number")
             except:
-                logger.warning("Images do not follow a video naming convention (e.g. video_1-001.jpg)")
+                logger.warning(
+                    "Images do not follow a video naming convention (e.g. video_1-001.jpg), the output GIF may be unordered"
+                )
+                logger.debug("You may wish to write your own sorting function here!")
+            logger.info("Will process {} images".format(len(image_paths)))
             mode = "directory"
     elif args.dataset is not None:
         # Get random image from dataset
@@ -313,7 +317,9 @@ if __name__ == "__main__":
             dataset_path = (
                 get_abs_path("datasets/ap10k") if args.dataset_path is None else get_abs_path(args.dataset_path)
             )
-            dataloader = AP10KDataset(dataset_path, split="test", sub_split=random.randint(1, 3)).make_dataloader(batch_size=1, shuffle=True)
+            dataloader = AP10KDataset(dataset_path, split="test", sub_split=random.randint(1, 3)).make_dataloader(
+                batch_size=1, shuffle=True
+            )
         else:
             logger.error("Unknown dataset: {}".format(args.dataset))
             exit(1)
