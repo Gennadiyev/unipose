@@ -4,6 +4,7 @@
 """
 
 from .unipose import UniPose
+from .uniskel import UniSkel
 
 
-__all__ = ["UniPose"]
+__all__ = ["UniPose", "UniSkel"]
