@@ -1,10 +1,11 @@
 """Datasets for pose estimation. All datasets are subclasses of L{unipose.dataset.BaseJointDataset}.
 
-Contains the following datasets:
+Supports the following datasets:
 
     - COCO (only human annotations)
-    - Animal Kingdom (animals from COCO)
+    - Animal Kingdom (animal annotations)
     - MPII (human pose estimation dataset)
+    - AP-10K (animal annotations)
 
 @author: Yikun Ji
 """
