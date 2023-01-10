@@ -12,19 +12,19 @@ from .base_joint_dataset import BaseJointDataset
 class COCODataset(BaseJointDataset):
 
     MAPPING = {
-        0: 0,  # Nose
-        1: 5,  # Left shoulder
-        2: 7,  # Left elbow
-        3: 9,  # Left wrist
-        4: 6,  # Right shoulder
-        5: 8,  # Right elbow
+        0: 0,   # Nose
+        1: 5,   # Left shoulder
+        2: 7,   # Left elbow
+        3: 9,   # Left wrist
+        4: 6,   # Right shoulder
+        5: 8,   # Right elbow
         6: 10,  # Right wrist
         7: 11,  # Left hip
         8: 13,  # Left knee
         9: 15,  # Left ankle
-        10: 12,  # Right hip
-        11: 14,  # Right knee
-        12: 16,  # Right ankle
+        10: 12, # Right hip
+        11: 14, # Right knee
+        12: 16, # Right ankle
     }
 
     EXTRA_TOKENS = {"left_eye": 1, "right_eye": 2, "left_ear": 3, "right_ear": 4}
