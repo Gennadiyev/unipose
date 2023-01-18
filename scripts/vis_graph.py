@@ -11,11 +11,10 @@ from unipose.datasets.animal_kingdom import AnimalKingdomDataset
 from unipose.datasets.coco import COCODataset
 from unipose.datasets.mpii import MPIIDataset
 
-from unipose.models import UniPose
-from unipose.losses import GLES
+from unipose.models import UniPose, UniSkel
 
 
-def inference(image_path_or_tensor, model, /, device=torch.device("cpu")):
+def inference(image_path_or_tensor, model, /, model_skel=None, device=torch.device("cpu")):
     model.eval()
     if isinstance(image_path_or_tensor, str):
         image = Image.open(image_path)
@@ -29,7 +28,12 @@ def inference(image_path_or_tensor, model, /, device=torch.device("cpu")):
         image = image_path_or_tensor.to(device)
     with torch.no_grad():
         output = model(image)
-    return output
+    
+    if model_skel is None:
+        return output
+    model_skel.eval()
+    skel = model_skel(image, output, mode="predict")
+    return output, skel
 
 
 OUTPUT_SIZE = 1024
@@ -62,7 +66,8 @@ def create_gif(arr_of_image_paths: List[str], output_path: str):
 
 @logger.catch
 def draw_skel(
-    src_image_path_or_arr: Union[str, np.ndarray], heatmaps: torch.Tensor, render_path: str, threshold: float = 0
+    src_image_path_or_arr: Union[str, np.ndarray], heatmaps: torch.Tensor, skel: torch.Tensor, 
+    render_path: str, keypoint_threshold: float = 0, edge_threshold: float = 0.2, use_uniskel = True
 ):
     """Draws the skeleton on the image."""
     if isinstance(src_image_path_or_arr, str):
@@ -121,7 +126,7 @@ def draw_skel(
         # _image_arr = (_image_arr - _image_arr.min()) / (_image_arr.max() - _image_arr.min())
         idx = np.argmax(_image_arr)
         conf = np.max(_image_arr)
-        if conf < threshold:
+        if conf < keypoint_threshold:
             x.append(0)
             y.append(0)
             confidence.append(0)
@@ -134,22 +139,34 @@ def draw_skel(
 
     # Draw lines between joints
     eps = 1e-6
-    if (x[1] + y[1] > eps) and (x[2] + y[2] > eps):
-        base_image_draw.line((x[1], y[1], x[2], y[2]), fill=__colors["arm_left"], width=__line_width)
-    if (x[2] + y[2] > eps) and (x[3] + y[3] > eps):
-        base_image_draw.line((x[2], y[2], x[3], y[3]), fill=__colors["arm_left"], width=__line_width)
-    if (x[4] + y[4] > eps) and (x[5] + y[5] > eps) and (x[6] + y[6] > eps):
-        base_image_draw.line((x[4], y[4], x[5], y[5]), fill=__colors["arm_right"], width=__line_width)
-    if (x[5] + y[5] > eps) and (x[6] + y[6] > eps):
-        base_image_draw.line((x[5], y[5], x[6], y[6]), fill=__colors["arm_right"], width=__line_width)
-    if (x[7] + y[7] > eps) and (x[8] + y[8] > eps):
-        base_image_draw.line((x[7], y[7], x[8], y[8]), fill=__colors["leg_left"], width=__line_width)
-    if (x[8] + y[8] > eps) and (x[9] + y[9] > eps):
-        base_image_draw.line((x[8], y[8], x[9], y[9]), fill=__colors["leg_left"], width=__line_width)
-    if (x[10] + y[10] > eps) and (x[11] + y[11] > eps):
-        base_image_draw.line((x[10], y[10], x[11], y[11]), fill=__colors["leg_right"], width=__line_width)
-    if (x[11] + y[11] > eps) and (x[12] + y[12] > eps):
-        base_image_draw.line((x[11], y[11], x[12], y[12]), fill=__colors["leg_right"], width=__line_width)
+    if not use_uniskel:
+        if (x[1] + y[1] > eps) and (x[2] + y[2] > eps):
+            base_image_draw.line((x[1], y[1], x[2], y[2]), fill=__colors["arm_left"], width=__line_width)
+        if (x[2] + y[2] > eps) and (x[3] + y[3] > eps):
+            base_image_draw.line((x[2], y[2], x[3], y[3]), fill=__colors["arm_left"], width=__line_width)
+        if (x[4] + y[4] > eps) and (x[5] + y[5] > eps) and (x[6] + y[6] > eps):
+            base_image_draw.line((x[4], y[4], x[5], y[5]), fill=__colors["arm_right"], width=__line_width)
+        if (x[5] + y[5] > eps) and (x[6] + y[6] > eps):
+            base_image_draw.line((x[5], y[5], x[6], y[6]), fill=__colors["arm_right"], width=__line_width)
+        if (x[7] + y[7] > eps) and (x[8] + y[8] > eps):
+            base_image_draw.line((x[7], y[7], x[8], y[8]), fill=__colors["leg_left"], width=__line_width)
+        if (x[8] + y[8] > eps) and (x[9] + y[9] > eps):
+            base_image_draw.line((x[8], y[8], x[9], y[9]), fill=__colors["leg_left"], width=__line_width)
+        if (x[10] + y[10] > eps) and (x[11] + y[11] > eps):
+            base_image_draw.line((x[10], y[10], x[11], y[11]), fill=__colors["leg_right"], width=__line_width)
+        if (x[11] + y[11] > eps) and (x[12] + y[12] > eps):
+            base_image_draw.line((x[11], y[11], x[12], y[12]), fill=__colors["leg_right"], width=__line_width)
+    else:
+        print(skel.shape)
+        if edge_threshold is None:
+            edge_threshold = (skel[0].sum())/(skel.shape[1]*skel.shape[2]-skel.shape[1])
+        print(edge_threshold)
+        for i in range(13):
+            for j in range(13):
+                if skel[0,i,j] < edge_threshold:
+                    continue
+                if (x[i] + y[i] > eps) and (x[j] + y[j] > eps):
+                    base_image_draw.line((x[i], y[i], x[j], y[j]), fill=__colors["arm_left"], width=__line_width)
 
     # For each joint, draw a circle
     for i in range(13):
@@ -229,7 +246,8 @@ if __name__ == "__main__":
         required=False,
         default="ak_P3_mammal",
     )
-    parser.add_argument("--checkpoint", type=str, default="exp/model-latest.pth")
+    parser.add_argument("--checkpoint_pose", type=str, default="exp/model-latest.pth")
+    parser.add_argument("--checkpoint_skel", type=str, default="exp/model_graph-latest.pth")
     parser.add_argument("--gpu", type=int, default=0, help="GPU ID. Set to -1 to use CPU")
     parser.add_argument("--image_size", type=int, default=256, help="Image size of input image.")
     parser.add_argument(
@@ -238,17 +256,22 @@ if __name__ == "__main__":
         default=4,
         help="Patch size of output keypoint heatmaps. Must be 4 if Unipose is used without modification",
     )
-    parser.add_argument("--output_dir", type=str, default="exp/output_vis")
-    parser.add_argument("--threshold", type=float, default=0.02, help="Threshold for keypoint confidence")
+    parser.add_argument("--output_dir", type=str, default="exp/output_graph")
+    parser.add_argument("--keypoint_threshold", type=float, default=0.02, help="Threshold for keypoint confidence")
+    parser.add_argument("--lmbda", type=float, default=0.2, help="Lambda for graph learning")
     args = parser.parse_args()
 
     output_dir = get_abs_path(args.output_dir, create_if_not_exists=True)
 
     # Exit if checkpoint not found
     # checkpoint_path = os.path.join(base_dir, args.checkpoint)
-    checkpoint_path = get_abs_path(args.checkpoint)
-    if not os.path.exists(checkpoint_path):
-        logger.error("Checkpoint not found: {}".format(checkpoint_path))
+    checkpoint_path_pose = get_abs_path(args.checkpoint_pose)
+    checkpoint_path_skel = get_abs_path(args.checkpoint_skel)
+    if not os.path.exists(checkpoint_path_pose):
+        logger.error("Checkpoint not found: {}".format(checkpoint_path_pose))
+        exit(1)
+    if not os.path.exists(checkpoint_path_skel):
+        logger.error("Checkpoint not found: {}".format(checkpoint_path_skel))
         exit(1)
 
     # Exit if image not found
@@ -314,8 +337,13 @@ if __name__ == "__main__":
     logger.debug("Creating model...")
     model = UniPose(13, resnet_layers=[3, 8, 36, 3])
     model = model.to(device)
-    logger.info("Loading checkpoint from {}...", checkpoint_path)
-    model.load_state_dict(torch.load(checkpoint_path, map_location=device))
+    logger.info("Loading checkpoint from {}...", checkpoint_path_pose)
+    model.load_state_dict(torch.load(checkpoint_path_pose, map_location=device))
+
+    model_skel = UniSkel(num_in_channels=3, heatmap_shape=(64,64), lmbda=2.)
+    model_skel = model_skel.to(device)
+    logger.info("Loading checkpoint from {}...", checkpoint_path_skel)
+    model_skel.load_state_dict(torch.load(checkpoint_path_skel, map_location=device))
 
     # Copy source image to output directory
     if mode == "image":
@@ -332,11 +360,11 @@ if __name__ == "__main__":
 
         # Inference
         logger.info("Processing image...")
-        ret = inference(image_path_or_tensor, model, device=device)
+        ret, skel = inference(image_path_or_tensor, model, model_skel, device=device)
 
         # Render skeleton image
         skel_path = os.path.join(output_dir, "skel.png")
-        draw_skel(image_path, ret, skel_path, threshold=args.threshold)
+        draw_skel(image_path, ret, skel, skel_path, keypoint_threshold=args.keypoint_threshold)
         logger.info("Skeleton image saved to {}".format(skel_path))
 
     elif mode == "dataset":
@@ -353,28 +381,29 @@ if __name__ == "__main__":
             logger.info("Saved source image to {}", image_path)
             kp_gt = batch["keypoint_images"]
             logger.debug("Drawing ground truth skeleton...")
-            draw_skel(image_array_src, kp_gt, os.path.join(output_dir, "gt.png"), threshold=args.threshold)
+            draw_skel(image_array_src, kp_gt, None, os.path.join(output_dir, "gt.png"), keypoint_threshold=args.keypoint_threshold, use_uniskel=False)
             logger.info("Saved ground truth skeleton to {}", os.path.join(output_dir, "gt.png"))
             image_path_or_tensor = image_tensor
             break
 
         # Inference
         logger.info("Processing image...")
-        ret = inference(image_path_or_tensor, model, device=device)
+        ret, skel = inference(image_path_or_tensor, model, model_skel, device=device)
+        print(skel)
 
         # Render skeleton image
         skel_path = os.path.join(output_dir, "skel.png")
-        draw_skel(image_path, ret, skel_path, threshold=args.threshold)
+        draw_skel(image_path, ret, skel, skel_path, keypoint_threshold=args.keypoint_threshold)
         logger.info("Skeleton image saved to {}".format(skel_path))
 
     elif mode == "directory":
         skeleton_images = []
         for idx, image_path in tqdm(enumerate(image_paths)):
             image_path_or_tensor = image_path
-            ret = inference(image_path_or_tensor, model, device=device)
+            ret, skel = inference(image_path_or_tensor, model, model_skel, device=device)
             # Render skeleton image
             skel_path = os.path.join(output_dir, "skel-{:06d}.png".format(idx))
-            draw_skel(image_path, ret, skel_path, threshold=args.threshold)
+            draw_skel(image_path, ret, skel, skel_path, keypoint_threshold=args.keypoint_threshold)
             skeleton_images.append(skel_path)
         # Create a GIF output
         gif_path = os.path.join(output_dir, "skel.gif")
