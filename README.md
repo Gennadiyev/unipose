@@ -1,4 +1,4 @@
-# Unipose<a href="https://hexops.com"><img align="right" alt="Hexops logo" src="docs/unipose.svg" width="37%"></img></a>
+# Unipose<a href="https://hexops.com"><img align="right" alt="Hexops logo" src="docs/unipose.svg" width="30%"></img></a>
 
 [![stable-docs](https://shields.io/badge/docs-stable-blue.svg)](https://gennadiyev.github.io/unipose/apidocs) [![style-black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.vercel.app/) [![python>=3.9](https://img.shields.io/badge/python->=3.8-green.svg)](https://www.python.org/downloads/) [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://mit-license.org/)
 
@@ -12,7 +12,7 @@
 
 <!-- ![Skeleton annotation of a giraffe](docs/skel_giraffe.png) ![Skeleton annotation of a human](docs/skel_human.png) -->
 
-<img src="docs/skel_giraffe.png" alt="Skeleton annotation of a giraffe" width="49%"></img> <img src="docs/skel_human.png" alt="Skeleton annotation of a human" width="49%"></img>
+<img src="docs/skel_giraffe.png" alt="Skeleton annotation of a giraffe" width="33%"></img> <img src="docs/skel_human.png" alt="Skeleton annotation of a human" width="33%"></img>
 
 ## Features
 
