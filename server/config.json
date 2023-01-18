@@ -1,0 +1,16 @@
+{
+    "host": "0.0.0.0",
+    "port": 5001,
+    "default_device": 1,
+    "paths": {
+        "font": "/home/dl2022/d3d/unipose/docs/blanket.otf",
+        "checkpoints": "/date/dl2022/d3d/exp_ext",
+        "cache_path": "/date/dl2022/d3d/server_cache",
+        "datasets": {
+            "mpii": "/home/dl2022/d3d/unipose/datasets/mpii",
+            "coco": "/home/dl2022/d3d/unipose/datasets/coco",
+            "animal_kingdom": "/home/dl2022/d3d/unipose/datasets/animal_kingdom",
+            "ap10k": "/home/dl2022/d3d/unipose/datasets/ap10k"
+        }
+    }
+}
