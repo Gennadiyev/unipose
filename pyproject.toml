@@ -1,14 +1,27 @@
 [project]
 name = "unipose"
-version = "0.0.1"
+version = "0.0.2"
 description = "Unified Pose Estimation Framework"
 authors = [
     {name = "Kunologist", email = "jiyikun2002@gmail.com"}
 ]
 dependencies = [
+    "torch>=1.13.0,<2.0.0",
+    "torchvision>=0.14.0,<1.0.0",
+    "tqdm",
+    "opencv-python>=4.0.0,<5.0.0",
+    "orjson",
+    "numpy",
+    "loguru",
+    "Pillow",
+    "flask",
+    "imageio",
+    "easydict",
+    "requests",
+    "pycocotools"
 ]
 keywords = ["pose-estimation", "pose", "framework", "skeleton", "animal-pose"]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 readme = "README.md"
 license = {text = "MIT"}
 
@@ -28,6 +41,7 @@ dev = [
     "flake8>=5.0.4",
     "black>=22.10.0",
     "isort>=5.10.1",
+    "pytest>=7.0.0",
 ]
 
 [tool.pdm.build]

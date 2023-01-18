@@ -1,0 +1,28 @@
+name: unipose
+channels:
+  - pytorch
+  - nvidia
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+  - conda-forge
+  - https://repo.anaconda.com/pkgs/main
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+  - defaults
+dependencies:
+  - python=3.8
+  - pytorch=1.13.0
+  - torchvision=0.14.0
+  - pip=22.3.1
+  - pip:
+    - opencv-python>=4.6.0.0,<4.7.0.0
+    - tqdm
+    - orjson
+    - numpy
+    - loguru
+    - pillow
+    - flask
+    - imageio
+    - easydict
+    - pycocotools
+    - requests
