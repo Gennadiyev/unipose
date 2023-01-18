@@ -3,7 +3,7 @@ from typing import Union, Optional, List, Tuple, Dict, Any, Callable, Literal
 
 import cv2
 import torch
-from pycocotools.coco import COCO
+from unipose.cocotools import COCO
 from torchvision.transforms import ToTensor
 
 from .base_joint_dataset import BaseJointDataset
