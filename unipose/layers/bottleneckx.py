@@ -6,6 +6,16 @@ from .selayer import SELayer
 
 class BottleneckX(nn.Module):
     def __init__(self, in_channels, channels, stride=1, groups=32, downsample=None, reduction=None):
+        """
+        The main block of SE-ResNeXt.
+
+        @param in_channels: The number of input channels.
+        @param channels: The number of hidden channels, and the output channels is 4 times of this.
+        @param stride: The stride for the grouped convolutions.
+        @param groups: The number of groups for grouped convolutions.
+        @param downsample: The downsample layer.
+        @param reduction: The reduction ratio for the SE layer. If None, no SE layer is used.
+        """
         super(BottleneckX, self).__init__()
         self.conv1 = nn.Conv2d(in_channels, channels, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(channels, momentum=0.1)
