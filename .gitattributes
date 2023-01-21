@@ -1,0 +1,2 @@
+# Our server consists of a large CSS template. Remove it from language detection.
+server/* linguist-vendored
