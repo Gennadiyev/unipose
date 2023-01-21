@@ -4,6 +4,10 @@ import torch.nn as nn
 
 class SELayer(nn.Module):
     def __init__(self, channels, reduction=16):
+        """
+        @param channels: The number of input channels.
+        @param reduction: The reduction factor for the number of channels and the dimension of hidden layer is channels // reduction.
+        """
         super(SELayer, self).__init__()
         self.avg_pool = nn.AdaptiveMaxPool2d(1)
         self.fc = nn.Sequential(
