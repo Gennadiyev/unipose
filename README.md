@@ -1,6 +1,6 @@
-# Unipose<a href="https://hexops.com"><img align="right" alt="Hexops logo" src="docs/unipose.svg" width="30%"></img></a>
+# Unipose<a href="https://hexops.com"><img align="left" alt="Hexops logo" src="docs/unipose.svg" width="30%" style="padding-right:16px"></img></a>
 
-[![stable-docs](https://shields.io/badge/docs-stable-blue.svg)](https://gennadiyev.github.io/unipose/apidocs) [![style-black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.vercel.app/) [![python>=3.9](https://img.shields.io/badge/python->=3.8-green.svg)](https://www.python.org/downloads/) [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://mit-license.org/)
+[![stable-docs](https://shields.io/badge/docs-stable-blue.svg)](https://gennadiyev.github.io/unipose/apidocs) [![style-black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.vercel.app/) [![python>=3.9](https://img.shields.io/badge/python->=3.8-green.svg)](https://www.python.org/downloads/) [![license-MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://mit-license.org/) ![workflow-status](https://img.shields.io/github/actions/workflow/status/Gennadiyev/unipose/pytest.yml)
 
 **Bridging the poses of humans and tetrapods with one general model.**
 
