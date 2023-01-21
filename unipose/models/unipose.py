@@ -12,6 +12,8 @@ class UniPose(nn.Module):
         self, keypoint_count, channels=64, groups=32, reduction=16, resnet_layers=[2, 2, 2, 2], duc_layers=[4, 2, 1]
     ):
         """
+        The UniPose model, which contains a SEResNeXt backbone to get the feature map and several DUC layers to upsample.
+
         @param keypoint_count: The number of keypoints, the output channels of the last layer.
         @param channels The number of hidden channels for the SEResNeXt.
         @param groups: The number of groups for the grouped convolution for the SEResNeXt.

@@ -5,6 +5,8 @@ import torch.nn as nn
 class SELayer(nn.Module):
     def __init__(self, channels, reduction=16):
         """
+        The Squeeze-and-Excitation layer, which is an attention mechanism for channel-wise feature maps.
+
         @param channels: The number of input channels.
         @param reduction: The reduction factor for the number of channels and the dimension of hidden layer is channels // reduction.
         """

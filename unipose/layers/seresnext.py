@@ -7,6 +7,8 @@ from .bottleneckx import BottleneckX
 class SEResNeXt(nn.Module):
     def __init__(self, channels=64, groups=32, reduction=16, layers=[2, 2, 2, 2]):
         """
+        The SE-ResNeXt model for getting the feature maps.
+
         @param channels: The number of hidden channels.
         @param groups: The number of groups for the grouped convolution for the BottleneckX.
         @param reduction: The reduction factor for the number of channels for the SElayer.

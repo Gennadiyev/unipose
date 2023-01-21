@@ -5,6 +5,8 @@ import torch.nn as nn
 class DUC(nn.Module):
     def __init__(self, in_channels, channels, upscale_factor=2, layer_number=2):
         """
+        The Dense Upsampling Convolutional (DUC) for upsampling the feature map.
+
         @param in_channels: The number of input channels.
         @param channels: The number of output channels.
         @param upscale_factor: The upscale factor for the pixel shuffle, the input size is (B, C, H, W) and the output size is (B, C // (upscale_factor * upscale_factor), H * upscale_factor, W * upscale_factor).

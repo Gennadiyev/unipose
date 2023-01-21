@@ -7,6 +7,8 @@ from .selayer import SELayer
 class BottleneckX(nn.Module):
     def __init__(self, in_channels, channels, stride=1, groups=32, downsample=None, reduction=None):
         """
+        The main block of SE-ResNeXt.
+
         @param in_channels: The number of input channels.
         @param channels: The number of hidden channels, and the output channels is 4 times of this.
         @param stride: The stride for the grouped convolutions.
