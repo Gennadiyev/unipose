@@ -6,7 +6,7 @@ from unipose.datasets import COCODataset, AnimalKingdomDataset, MPIIDataset, AP1
 
 @pytest.mark.contains_absolute_path
 def test_coco():
-    dataset = COCODataset("/home/dl2022/d3d/unipose/datasets/coco", split="train")
+    dataset = COCODataset("datasets/coco", split="train")
     assert len(dataset) == 64115
     data = dataset[0]
     assert data["unipose_keypoints"].shape == torch.Size([13, 2])
@@ -18,7 +18,7 @@ def test_coco():
 @pytest.mark.contains_absolute_path
 def test_animal_kingdom():
     dataset = AnimalKingdomDataset(
-        "/home/dl2022/d3d/unipose/datasets/animal_kingdom", sub_category="ak_P3_amphibian", split="train"
+        "datasets/animal_kingdom", sub_category="ak_P3_amphibian", split="train"
     )
     assert len(dataset) == 5188
     data = dataset[0]
@@ -29,7 +29,7 @@ def test_animal_kingdom():
 
 @pytest.mark.contains_absolute_path
 def test_mpii():
-    dataset = MPIIDataset("/home/dl2022/d3d/unipose/datasets/mpii", split="train")
+    dataset = MPIIDataset("datasets/mpii", split="train")
     assert len(dataset) == 22246
     data = dataset[0]
     assert data["unipose_keypoints"].shape == torch.Size([13, 2])
@@ -39,7 +39,7 @@ def test_mpii():
 
 @pytest.mark.contains_absolute_path
 def test_ap10k():
-    dataset = AP10KDataset("/home/dl2022/d3d/unipose/datasets/ap10k", split="val")
+    dataset = AP10KDataset("datasets/ap10k", split="val")
     assert len(dataset) == 995
     data = dataset[0]
     assert data["unipose_keypoints"].shape == torch.Size([13, 2])

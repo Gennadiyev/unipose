@@ -56,7 +56,7 @@ profile = "black"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -m \"not slow\""
+addopts = "-ra -m \"not slow and not contains_absolute_path\""
 testpaths = [
     "tests/*"
 ]
