@@ -63,10 +63,3 @@ class UniPose(nn.Module):
         x = self.duc3(x)
         x = self.conv_out(x)
         return x
-
-
-if __name__ == "__main__":
-    from torchinfo import summary
-
-    model = UniPose(17, channels=64, groups=32, reduction=16, resnet_layers=[3, 8, 36, 3], duc_layers=[4, 2, 1])
-    summary(model, input_size=(1, 3, 256, 256), depth=10)

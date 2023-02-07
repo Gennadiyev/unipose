@@ -86,9 +86,3 @@ class SEResNeXt(nn.Module):
         x = self.layer4(x)
         return x
 
-
-if __name__ == "__main__":
-    from torchinfo import summary
-
-    model = SEResNeXt(channels=64, groups=32, reduction=16, layers=[2, 2, 2, 2])
-    summary(model, input_size=(1, 3, 256, 256), depth=10)

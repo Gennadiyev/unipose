@@ -28,10 +28,3 @@ class DUC(nn.Module):
 
     def forward(self, x):
         return self.layers(x)
-
-
-if __name__ == "__main__":
-    from torchinfo import summary
-
-    model = DUC(64, 256, 2, 3)
-    summary(model, input_size=(1, 64, 4, 4))
