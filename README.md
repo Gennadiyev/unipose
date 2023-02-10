@@ -63,12 +63,12 @@ conda activate unipose
 
 ### Download pretrained models
 
-Our models are not that heavy (~169 MB each). Fetch one from the table below. We suggest putting them under `$UNIPOSE_ROOT/models`.
+Our models are not that heavy (~169 MB each). Fetch one from [this Google Drive link](https://drive.google.com/drive/folders/1eJ9RyLHcezrxE02uHBNmrI0Wxg4OPkfQ). We suggest putting them under `$UNIPOSE_ROOT/models`.
 
 | Model | Specialty |
 | --- | --- |
-| [`model_run-5dd8_ep-60.pth`](https://drive.google.com/drive/folders/1eJ9RyLHcezrxE02uHBNmrI0Wxg4OPkfQ?usp=sharing) | For humans and tetrapods. Known to perform poorly if the pose is partially occluded or looks strange. |
-| [`model_run-cd37_ep-100.pth`](https://drive.google.com/file/d/1f3uAjAzKh5O4Gh6vNuDZ99e78JlhoBnT/view?usp=sharing) | For humans and tetrapods. More stable than `model_run-5dd8_ep-60.pth` but not as accurate in confidence value. |
+| [`model_run-5dd8_ep-60.pth`](https://drive.google.com/file/d/12NJ5EFBeyQdf-dtMDrV5Kg82Gq9vUl7L/view) | For humans and tetrapods. Known to perform poorly if the pose is partially occluded or looks strange. |
+| [`model_run-cd37_ep-100.pth`](https://drive.google.com/file/d/1f3uAjAzKh5O4Gh6vNuDZ99e78JlhoBnT/view) | For humans and tetrapods. More stable than `model_run-5dd8_ep-60.pth` but not as accurate in confidence value. |
 
 ### Run a flask server for testing
 
