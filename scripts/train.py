@@ -100,6 +100,8 @@ if __name__ == "__main__":
     parser.add_argument("--mpii_path", type=str, default="datasets/mpii")
     parser.add_argument("--animal_kingdom", action="store_true", default=False)
     parser.add_argument("--animal_kingdom_path", type=str, default="datasets/animal_kingdom")
+    parser.add_argument("--ap10k", action="store_true", default=False)
+    parser.add_argument("--ap10k_path", type=str, default="datasets/ap10k")
     parser.add_argument("-a", "--all", action="store_true", default=False)
     # Output configuration
     parser.add_argument("-o", "--output_dir", type=str, default="exp")
@@ -126,7 +128,7 @@ if __name__ == "__main__":
     logger.info("Using device {} (GPU {})", device, args.gpu)
 
     # Create model
-    logger.debug("Creating model...")
+    logger.debug("Creating UniPose model...")
     model = UniPose(13, resnet_layers=[3, 8, 36, 3])
     model = model.to(device)
 
@@ -144,11 +146,12 @@ if __name__ == "__main__":
         "animal_kingdom": get_abs_path(args.animal_kingdom_path),
         "mpii": get_abs_path(args.mpii_path),
         "coco": get_abs_path(args.coco_path),
+        "ap10k": get_abs_path(args.ap10k_path),
     }
 
     datasets = []
     logger.info("Loading datasets...")
-    from unipose.datasets import AnimalKingdomDataset, MPIIDataset, COCODataset, ConcatJointDataset
+    from unipose.datasets import AnimalKingdomDataset, MPIIDataset, COCODataset, ConcatJointDataset, AP10KDataset
 
     if args.animal_kingdom or args.all:
         _path = dataset_path.get("animal_kingdom")
@@ -167,8 +170,17 @@ if __name__ == "__main__":
         logger.debug("Loading COCO dataset from {}...", _path)
         dataset_coco = COCODataset(path=_path)
         datasets.append(dataset_coco)
+    if args.ap10k or args.all:
+        _path = dataset_path.get("ap10k")
+        logger.debug("Loading AP10K dataset from {}...", _path)
+        dataset_ap10k_1 = AP10KDataset(path=_path, split="train", sub_split=1)
+        dataset_ap10k_2 = AP10KDataset(path=_path, split="train", sub_split=2)
+        dataset_ap10k_3 = AP10KDataset(path=_path, split="train", sub_split=3)
+        datasets.append(dataset_ap10k_1)
+        datasets.append(dataset_ap10k_2)
+        datasets.append(dataset_ap10k_3)
     if len(datasets) == 0:
-        logger.error("No dataset selected: --coco, --mpii, --animal_kingdom or -a / --all must be specified")
+        logger.error("No dataset selected: --coco, --mpii, --animal_kingdom, --ap10k or -a / --all must be specified")
         exit(1)
     elif len(datasets) >= 2:
         dataset = ConcatJointDataset(datasets)
