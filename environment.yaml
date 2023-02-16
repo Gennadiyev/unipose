@@ -15,6 +15,7 @@ dependencies:
   - pip:
     - torch==1.13.1
     - torchvision>=0.14,<0.15
+    - torchinfo
     - opencv-python>=4.6.0.0,<4.7.0.0
     - tqdm
     - orjson

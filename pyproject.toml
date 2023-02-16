@@ -18,7 +18,8 @@ dependencies = [
     "imageio",
     "easydict",
     "requests",
-    "pycocotools"
+    "pycocotools",
+    "torchinfo"
 ]
 keywords = ["pose-estimation", "pose", "framework", "skeleton", "animal-pose"]
 requires-python = ">=3.10"
