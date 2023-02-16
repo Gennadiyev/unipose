@@ -30,6 +30,17 @@
 
 During development, we use PyTorch 1.13.0 and torchvision 0.14.0.
 
+### Install with conda
+
+Or if you use [conda](https://docs.conda.io/en/latest/):
+
+```bash
+git clone git@github.com:Gennadiyev/unipose.git
+cd unipose
+conda env create -f environment.yaml -n unipose
+conda activate unipose
+```
+
 ### Install with pip
 
 The package is currently not published to PyPI. To install, clone the repository and run `pip install -e .` in the root directory:
@@ -48,17 +59,6 @@ Or if you use [poetry](https://python-poetry.org/):
 git clone git@github.com:Gennadiyev/unipose.git
 cd unipose
 poetry add -D .
-```
-
-### Install with conda
-
-Or if you use [conda](https://docs.conda.io/en/latest/):
-
-```bash
-git clone git@github.com:Gennadiyev/unipose.git
-cd unipose
-conda env create -f environment.yaml -n unipose
-conda activate unipose
 ```
 
 ## Usage
