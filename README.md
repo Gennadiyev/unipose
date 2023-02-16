@@ -1,6 +1,6 @@
 # Unipose<a href="https://hexops.com"><img align="left" alt="Hexops logo" src="docs/unipose.svg" width="30%" style="padding-right:16px"></img></a>
 
-[![stable-docs](https://shields.io/badge/docs-stable-blue.svg)](https://gennadiyev.github.io/unipose/apidocs) [![style-black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.vercel.app/) [![python>=3.9](https://img.shields.io/badge/python->=3.8-green.svg)](https://www.python.org/downloads/) [![license-MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://mit-license.org/) ![workflow-status](https://img.shields.io/github/actions/workflow/status/Gennadiyev/unipose/pytest.yml)
+[![stable-docs](https://shields.io/badge/docs-stable-blue.svg)](https://gennadiyev.github.io/unipose/apidocs) [![style-black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.vercel.app/) [![python>=3.10](https://img.shields.io/badge/python->=3.10-green.svg)](https://www.python.org/downloads/) [![license-MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://mit-license.org/) ![workflow-status](https://img.shields.io/github/actions/workflow/status/Gennadiyev/unipose/pytest.yml)
 
 **Bridging the poses of humans and tetrapods with one general model.**
 
@@ -24,7 +24,9 @@
 
 ### Prerequisites
 
-**Python 3.9** or later is required since we will use [dataclasses](https://docs.python.org/3/library/dataclasses.html) in the future and we heavily rely on [type hints](https://docs.python.org/3/library/typing.html) as updated in [PEP 585](https://www.python.org/dev/peps/pep-0585/) and [PEP 586](https://peps.python.org/pep-0586/) (`Literal` type).
+**Python 3.10** is required since we are using `typing.TypeAlias` and `typing.Protocol` in the codebase.
+
+<!-- **Python 3.9** or later is required since we will use [dataclasses](https://docs.python.org/3/library/dataclasses.html) in the future and we heavily rely on [type hints](https://docs.python.org/3/library/typing.html) as updated in [PEP 585](https://www.python.org/dev/peps/pep-0585/) and [PEP 586](https://peps.python.org/pep-0586/) (`Literal` type). -->
 
 During development, we use PyTorch 1.13.0 and torchvision 0.14.0.
 
@@ -59,7 +61,7 @@ conda env create -f environment.yaml -n unipose
 conda activate unipose
 ```
 
-## Usage for testing
+## Usage
 
 ### Download pretrained models
 
@@ -69,16 +71,6 @@ Our models are not that heavy (~169 MB each). Fetch one from [this Google Drive 
 | --- | --- |
 | [`model_run-5dd8_ep-60.pth`](https://drive.google.com/file/d/12NJ5EFBeyQdf-dtMDrV5Kg82Gq9vUl7L/view) | For humans and tetrapods. Known to perform poorly if the pose is partially occluded or looks strange. |
 | [`model_run-cd37_ep-100.pth`](https://drive.google.com/file/d/1f3uAjAzKh5O4Gh6vNuDZ99e78JlhoBnT/view) | For humans and tetrapods. More stable than `model_run-5dd8_ep-60.pth` but not as accurate in confidence value. |
-
-### Run a flask server for testing
-
-Our test server is out! It is a flask server that can be used to test the models. Especially useful during training since it scans all models under the model directory and let users pick any model they want. **Not optimized for multi-user cases**, if more than 1 user is perfoming inference, the server will queue them (expectedly).
-
-1. Edit the `server/config.json` file to change the font path, port and model path. Usually the directory containing of the experiment output path as specified in `output_dir` parameter during a [train run](#start-training).
-
-2. Run `python3 server/server.py server/config.json`.
-
-Note: **Do not change the naming scheme of the model file.** The server will automatically detect the model epoch and run ID.
 
 ### Visualize skeleton with script
 
@@ -104,6 +96,16 @@ python scripts/visualize.py \
 Use `python3 scripts/visualize.py --help` to see the full usage. 
 
 > *Hidden feature!* The `image_path` also supports a directory path. The script will visualize all images in the directory, and output a GIF animation! Files under the directory must follow the naming scheme `*-{id}.*` or `*_{id}.*` (more specifically in regex, `^.+[-_]\d+\..+$`), or the output GIF may have unsorted frames.
+
+### *(Beta)* Run a flask server for testing
+
+Our test server is out! It is a flask server that can be used to test the models. Especially useful during training since it scans all models under the model directory and let users pick any model they want. **Not optimized for multi-user case**, if more than 1 user is perfoming inference, the server will queue them (expectedly).
+
+1. Edit the `server/config.json` file to change the font path, port and model path. Usually the directory containing of the experiment output path as specified in `output_dir` parameter during a [train run](#start-training).
+
+2. Run `python3 server/server.py server/config.json`.
+
+Note: **Do not change the naming scheme of the model file.** The server will automatically detect the model epoch and run ID.
 
 ## Training
 

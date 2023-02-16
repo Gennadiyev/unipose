@@ -10,11 +10,11 @@ channels:
   - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
   - defaults
 dependencies:
-  - python=3.8
-  - pytorch=1.13.0
-  - torchvision=0.14.0
-  - pip=22.3.1
+  - python=3.10
+  - pip
   - pip:
+    - torch==1.13.1
+    - torchvision>=0.14,<0.15
     - opencv-python>=4.6.0.0,<4.7.0.0
     - tqdm
     - orjson
@@ -26,3 +26,4 @@ dependencies:
     - easydict
     - pycocotools
     - requests
+    - pytest
