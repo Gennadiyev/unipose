@@ -59,7 +59,7 @@ profile = "black"
 minversion = "6.0"
 addopts = "-ra -m \"not slow and not contains_absolute_path\""
 testpaths = [
-    "tests/*"
+    "./tests/*"
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
