@@ -1,4 +1,4 @@
-# Unipose<a href="https://hexops.com"><img align="left" alt="Hexops logo" src="docs/unipose.svg" width="30%" style="padding-right:16px"></img></a>
+# Unipose<a href="https://github.com/Gennadiyev/unipose"><img align="left" alt="Hexops logo" src="docs/unipose.svg" width="30%" style="padding-right:16px"></img></a>
 
 [![stable-docs](https://shields.io/badge/docs-stable-blue.svg)](https://gennadiyev.github.io/unipose/apidocs) [![style-black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.vercel.app/) [![python>=3.10](https://img.shields.io/badge/python->=3.10-green.svg)](https://www.python.org/downloads/) [![license-MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://mit-license.org/) ![workflow-status](https://img.shields.io/github/actions/workflow/status/Gennadiyev/unipose/pytest.yml)
 
