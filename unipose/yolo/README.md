@@ -1,10 +1,10 @@
-# yolo_unipose
+# Yolo_unipose
 
 + main contributor: [Xiangyun Rao](https://github.com/xyrrrrrrrr)
 
 ## Intro
 
-yolo_unipose is a pre-processing tool for the [Unipose](https://github.com/Gennadiyev/unipose), which is based on the [YOLOv5](https://github.com/ultralytics/yolov5). It is used to get the main creature in the image, judge its kind, and then return the bounding box of the creature.
+Yolo_unipose is a pre-processing tool for the [Unipose](https://github.com/Gennadiyev/unipose), which is based on the [YOLOv5](https://github.com/ultralytics/yolov5). It is used to get the main creature in the image, judge its kind, and then return the bounding box of the creature.
 
 ## How to use
 
