@@ -152,6 +152,7 @@ The log, model checkpoints, optimizer states will be saved to the `exp` director
 
 - [Yikun Ji (Kunologist)](https://github.com/Gennadiyev)
 - [Qi Fan (fanqiNO1)](https://github.com/fanqiNO1)
+- [Xiangyun Rao (xyrrrrrrrr)](https://github.com/xyrrrrrrrr)
 
 ## Contributing
 
