@@ -1,4 +1,4 @@
-# Unipose<a href="https://github.com/Gennadiyev/unipose"><img align="left" alt="Hexops logo" src="docs/unipose.svg" width="30%" style="padding-right:16px"></img></a>
+# Unipose<a href="https://github.com/Gennadiyev/unipose"><img align="left" alt="Unipose logo" src="docs/unipose.svg" width="30%" style="padding-right:16px"></img></a>
 
 [![stable-docs](https://shields.io/badge/docs-stable-blue.svg)](https://gennadiyev.github.io/unipose/apidocs) [![style-black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://black.vercel.app/) [![python>=3.10](https://img.shields.io/badge/python->=3.10-green.svg)](https://www.python.org/downloads/) [![license-MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://mit-license.org/) ![workflow-status](https://img.shields.io/github/actions/workflow/status/Gennadiyev/unipose/pytest.yml)
 
@@ -8,9 +8,8 @@
 
 - **Pose estimation**: Unipose can estimate the pose of any tetrapod with high accuracy.
 - **Pose tracking**: Unipose can track the pose of any tetrapod in a video sequence. (TODO)
-- **Animal Classification**: Unipose can classify the species of any tetrapod based on its pose. (TODO) -->
-
-<!-- ![Skeleton annotation of a giraffe](docs/skel_giraffe.png) ![Skeleton annotation of a human](docs/skel_human.png) -->
+- **Animal Classification**: Unipose can classify the species of any tetrapod based on its pose. (TODO) 
+-->
 
 <img src="docs/skel_giraffe.png" alt="Skeleton annotation of a giraffe" width="33%"></img> <img src="docs/skel_human.png" alt="Skeleton annotation of a human" width="33%"></img>
 
@@ -24,9 +23,7 @@
 
 ### Prerequisites
 
-**Python 3.10** is required since we are using `typing.TypeAlias` and `typing.Protocol` in the codebase.
-
-<!-- **Python 3.9** or later is required since we will use [dataclasses](https://docs.python.org/3/library/dataclasses.html) in the future and we heavily rely on [type hints](https://docs.python.org/3/library/typing.html) as updated in [PEP 585](https://www.python.org/dev/peps/pep-0585/) and [PEP 586](https://peps.python.org/pep-0586/) (`Literal` type). -->
+**Python 3.10** is required since we are using `typing.TypeAlias` and `typing.Protocol` in the codebase. If you are wondering, we are also using [dataclasses](https://docs.python.org/3/library/dataclasses.html) and heavily rely on [type hints](https://docs.python.org/3/library/typing.html) as updated in [PEP 585](https://www.python.org/dev/peps/pep-0585/) and [PEP 586](https://peps.python.org/pep-0586/) (`Literal` type). 
 
 During development, we use PyTorch 1.13.0 and torchvision 0.14.0.
 
@@ -152,6 +149,7 @@ The log, model checkpoints, optimizer states will be saved to the `exp` director
 
 - [Yikun Ji (Kunologist)](https://github.com/Gennadiyev)
 - [Qi Fan (fanqiNO1)](https://github.com/fanqiNO1)
+- [Xiangyun Rao (xyrrrrrrrr)](https://github.com/xyrrrrrrrr)
 
 ## Contributing
 
