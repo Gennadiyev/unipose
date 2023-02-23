@@ -16,3 +16,4 @@ apidocs
 .gittoken
 server_cache
 .conda
+.vscode
