@@ -23,7 +23,7 @@ class GLES(nn.Module):
         i.e.
         $ \sum_{i,j} W_{ij}\|(X_i-X_j)\|^2 + \lambda \sum_{i,j} W_{ij}^2 $
 
-        When $\lambda$ is larger, the model shows a greater tolerance to the pairwise distance.
+        When $\lambda$ is larger, the model shows a greater tolerance to the difference of pairwise distance.
 
     Settings of the layer:
     >   num_nodes: number of nodes $N$ of the graph. Defaultly set to 'None'.
@@ -73,6 +73,7 @@ class GLES(nn.Module):
             equ = g.sum() - edges
             grad = torch.autograd.grad(equ, gamma, create_graph=True)[0]
             # Gradient Clipping. IMPORTANT!
+            # Otherwise, gradient explosion might occur.
             grad = torch.clip(torch.abs(grad), min=1e-5) * torch.sign(grad)    
             gamma = gamma - (equ / grad)
 
