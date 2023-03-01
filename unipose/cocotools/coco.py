@@ -137,9 +137,9 @@ class COCO:
         """
         Get ann ids that satisfy given filter conditions. default skips that filter
         :param imgIds  (int array)     : get anns for given imgs
-               catIds  (int array)     : get anns for given cats
-               areaRng (float array)   : get anns for given area range (e.g. [0 inf])
-               iscrowd (boolean)       : get anns for given crowd label (False or True)
+        :param catIds  (int array)     : get anns for given cats
+        :param areaRng (float array)   : get anns for given area range (e.g. [0 inf])
+        :param iscrowd (boolean)       : get anns for given crowd label (False or True)
         :return: ids (int array)       : integer array of ann ids
         """
         imgIds = imgIds if _isArrayLike(imgIds) else [imgIds]
@@ -381,7 +381,7 @@ class COCO:
         '''
         Download COCO images from mscoco.org server.
         :param tarDir (str): COCO results directory name
-               imgIds (list): images to be downloaded
+        :param imgIds (list): images to be downloaded
         :return:
         '''
         if tarDir is None:

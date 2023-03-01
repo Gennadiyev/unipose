@@ -15,3 +15,5 @@ test_images
 apidocs
 .gittoken
 server_cache
+.conda
+.vscode

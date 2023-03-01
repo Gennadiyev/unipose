@@ -5,6 +5,7 @@
 
 from abc import ABC, abstractmethod
 from collections import OrderedDict
+from typing import Tuple
 
 import torch
 from torch.utils.data import Dataset, DataLoader, ConcatDataset
@@ -38,12 +39,13 @@ class BaseJointDataset(Dataset, ABC):
     def __len__(self):
         raise NotImplementedError
 
-    def _apply_mapping(self, keypoints: torch.Tensor, mask: torch.Tensor):
+    def _apply_mapping(self, keypoints: torch.Tensor, mask: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, list]:
         """
         Apply the mapping from any dataset to the unipose format. This is used to reorder the keypoints and mask to the unipose format, according to the C{MAPPING} and C{EXTRA_TOKENS} class variables.
 
         @param keypoints: The keypoints to reorder.
         @param mask: The mask to reorder.
+        @return: The reordered keypoints (shape: (13, 2)), the reordered mask (shape: (13,)), the extra keypoints (shape: (N, 2)), and the names of the extra keypoints (list of strings of length N)
         """
         reordered_keypoints = torch.stack([keypoints[self.MAPPING[i]] for i in self.MAPPING])
         reordered_mask = torch.stack([mask[self.MAPPING[i]] for i in self.MAPPING])
@@ -57,7 +59,7 @@ class BaseJointDataset(Dataset, ABC):
         else:
             return reordered_keypoints, reordered_mask, torch.zeros(0, 2), []
 
-    def make_dataloader(self, image_size: int = 256, scale_factor: int = 4, *args, **kwargs):
+    def make_dataloader(self, image_size: int = 256, scale_factor: int = 4, *args, **kwargs) -> DataLoader:
         """Make a dataloader for the dataset.
 
         A unipose dataset returns a dictionary with the following keys: "images", "keypoint_images", "masks", "extra_keypoints", "extra_tokens".
@@ -66,6 +68,7 @@ class BaseJointDataset(Dataset, ABC):
         @param scale_factor: The factor to scale the image by.
         @param args: Other arguments to pass to the DataLoader.
         @param kwargs: Other keyword arguments to pass to the DataLoader.
+        @return: A DataLoader for the dataset.
         """
 
         if "collate_fn" in kwargs:
@@ -115,6 +118,11 @@ class ConcatJointDataset(ConcatDataset):
         """Make a dataloader for the concat-ed dataset.
 
         A unipose dataset returns a dictionary with the following keys: "images", "keypoint_images", "masks", "extra_keypoints", "extra_tokens".
+
+        @param image_size: The size of the image to resize to.
+        @param scale_factor: The factor to scale the image by.
+        @param args: Other arguments to pass to the DataLoader.
+        @param kwargs: Other keyword arguments to pass to the DataLoader.
         """
         if "collate_fn" in kwargs:
             raise ValueError("collate_fn should not be set for BaseJointDataset, a default is provided")
