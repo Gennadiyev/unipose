@@ -109,6 +109,7 @@ class GLES_fc(nn.Module):
 if __name__ == "__main__":
     print("A Test of Correctness on Graph_Learning Layer.")
     lmbda = 2.0
+    
     # A test example is as follows.
     # x = [
     #         [1.0, 1.0, 1.0],  # feature of node 0
